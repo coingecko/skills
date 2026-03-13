@@ -68,9 +68,15 @@ and are not vetted by CoinGecko. For reviewed metadata, use
 
 ---
 
-## `GET /onchain/simple/networks/{network}/token_price/{addresses}`
+## `GET /onchain/simple/networks/{network}/token_price/{addresses}` — Token Price by Token Addresses
 
-Token prices for up to 100 contract addresses. Real-time (cacheless) for all paid plans.
+| Field | Value |
+|---|---|
+| Description | Token prices for up to 100 contract addresses |
+| Path | `GET /onchain/simple/networks/{network}/token_price/{addresses}` |
+| Plan | Paid |
+
+### Parameters
 
 | Parameter | Type | Required | Description |
 |---|---|---|---|
@@ -84,7 +90,7 @@ Token prices for up to 100 contract addresses. Real-time (cacheless) for all pai
 | `include_inactive_source` | boolean | No | When no active pool found, expand to recently active pools (up to 1 year). Default: `false` |
 
 ### Notes
-- All response values are strings.
+- Real-time (cacheless) for all paid plans.
 - Price is sourced from GeckoTerminal's routing (best pool by liquidity/activity). For a fixed price source, use `references/onchain-pools.md` → `GET /onchain/networks/{network}/pools/{address}`.
 - Unrecognised addresses are silently ignored.
 
@@ -118,13 +124,30 @@ Token prices for up to 100 contract addresses. Real-time (cacheless) for all pai
 }
 ```
 
-All attribute maps are keyed by token contract address. `last_trade_timestamp` values are integers (UNIX); all others are strings.
+### Response Fields
+
+All attribute maps are keyed by token contract address.
+
+| Field | Type | Description |
+|---|---|---|
+| `token_prices` | object | Price in USD per address (string values) |
+| `market_cap_usd` | object | Market cap in USD per address — present when `include_market_cap=true` |
+| `h24_volume_usd` | object | 24hr volume in USD per address — present when `include_24hr_vol=true` |
+| `h24_price_change_percentage` | object | 24hr price change % per address — present when `include_24hr_price_change=true` |
+| `total_reserve_in_usd` | object | Total reserve in USD per address — present when `include_total_reserve_in_usd=true` |
+| `last_trade_timestamp` | object | Most recent trade timestamp per address (integer, UNIX seconds) |
 
 ---
 
 ## `GET /onchain/networks/{network}/tokens/{address}` — Token Data by Token Address
 
-Single token: market data + optional top pool sideload.
+| Field | Value |
+|---|---|
+| Description | Single token market data with optional top pool sideload |
+| Path | `GET /onchain/networks/{network}/tokens/{address}` |
+| Plan | Paid |
+
+### Parameters
 
 | Parameter | Type | Required | Description |
 |---|---|---|---|
@@ -134,7 +157,10 @@ Single token: market data + optional top pool sideload.
 | `include_composition` | boolean | No | Include token balances and liquidity per pool (requires `include=top_pools`). Default: `false` |
 | `include_inactive_source` | boolean | No | Expand to recently active pools if no active pool found. Default: `false` |
 
-### Token Data Attributes
+### Notes
+- `included` array (when `include=top_pools`) contains pool objects matching the shared pool shape from `references/onchain-pools.md`. Only the single most liquid pool per token is returned.
+
+### Response Fields
 
 | Field | Type | Description |
 |---|---|---|
@@ -162,16 +188,17 @@ Single token: market data + optional top pool sideload.
 | `completed_at` | string \| null | ISO 8601 graduation timestamp |
 | `migrated_destination_pool_address` | string \| null | Pool address post-migration |
 
-The `included` array (when `include=top_pools`) contains pool objects matching the
-shared pool shape from `references/onchain-pools.md`. Only the single most liquid
-pool per token is returned.
-
 ---
 
-## `GET /onchain/networks/{network}/tokens/multi/{addresses}` — Tokens Data (Batch)
+## `GET /onchain/networks/{network}/tokens/multi/{addresses}` — Tokens Data by Token Addresses
 
-Same as single token endpoint, but batch. Up to 50 addresses; exceeding 1 address
-requires Analyst plan or above.
+| Field | Value |
+|---|---|
+| Description | Batch token market data for up to 50 addresses |
+| Path | `GET /onchain/networks/{network}/tokens/multi/{addresses}` |
+| Plan | Paid |
+
+### Parameters
 
 | Parameter | Type | Required | Description |
 |---|---|---|---|
@@ -181,26 +208,41 @@ requires Analyst plan or above.
 | `include_composition` | boolean | No | Default: `false` |
 | `include_inactive_source` | boolean | No | Default: `false` |
 
-Response `data` is an array; all other fields identical to single token endpoint.
+### Notes
+- Response `data` is an array; all other fields identical to the single token endpoint above.
+- Exceeding 1 address requires Analyst plan or above (max 50).
 
 ---
 
 ## `GET /onchain/networks/{network}/tokens/{address}/info` — Token Info by Token Address
 
-Token metadata: name, symbol, image, socials, description, GT Score, holder distribution.
-See [Shared Token Info Shape](#shared-token-info-shape) for full field reference.
+| Field | Value |
+|---|---|
+| Description | Token metadata: name, symbol, image, socials, description, GT Score, holder distribution |
+| Path | `GET /onchain/networks/{network}/tokens/{address}/info` |
+| Plan | Paid |
+
+### Parameters
 
 | Parameter | Type | Required | Description |
 |---|---|---|---|
 | `network` | string | Yes | Network ID |
 | `address` | string | Yes | Token contract address |
 
+### Notes
+- Response fields follow the [Shared Token Info Shape](#shared-token-info-shape).
+
 ---
 
 ## `GET /onchain/networks/{network}/pools/{pool_address}/info` — Pool Tokens Info by Pool Address
 
-Returns Token Info objects for both the base and quote tokens of a pool. Response
-`data` is an array of two token objects matching the Shared Token Info Shape.
+| Field | Value |
+|---|---|
+| Description | Token Info objects for both base and quote tokens of a pool |
+| Path | `GET /onchain/networks/{network}/pools/{pool_address}/info` |
+| Plan | Paid |
+
+### Parameters
 
 | Parameter | Type | Required | Description |
 |---|---|---|---|
@@ -212,11 +254,21 @@ Returns Token Info objects for both the base and quote tokens of a pool. Respons
 - For pool market data (price, volume, transactions), use `references/onchain-pools.md` → `GET /onchain/networks/{network}/pools/{address}` instead.
 - `holders` data is Beta; supported chains: Solana, EVM (Ethereum, Polygon, BNB, Arbitrum, Optimism, Base), Sui, TON, Ronin.
 
+### Response Fields
+- Response `data` is an array of two token objects (base and quote token).
+- Each object follows the [Shared Token Info Shape](#shared-token-info-shape).
+
 ---
 
 ## `GET /onchain/networks/{network}/tokens/{token_address}/pools` — Top Pools by Token Address
 
-Returns pools for a given token, ranked by combined liquidity and 24hr volume.
+| Field | Value |
+|---|---|
+| Description | Pools for a given token, ranked by combined liquidity and 24hr volume |
+| Path | `GET /onchain/networks/{network}/tokens/{token_address}/pools` |
+| Plan | Paid |
+
+### Parameters
 
 | Parameter | Type | Required | Description |
 |---|---|---|---|
@@ -228,32 +280,59 @@ Returns pools for a given token, ranked by combined liquidity and 24hr volume.
 | `include_gt_community_data` | boolean | No | Default: `false` |
 | `include_inactive_source` | boolean | No | Expand to recently active pools. Default: `false` |
 
-Pool response shape follows `references/onchain-pools.md`. Additionally includes
-`last_trade_timestamp` (integer, UNIX) per pool.
+### Notes
+- Max 20 pools per page.
+
+### Response Fields
+- Pool objects follow the shared pool shape from `references/onchain-pools.md`.
+- Each pool additionally includes `last_trade_timestamp` (integer, UNIX seconds).
 
 ---
 
 ## `GET /onchain/tokens/info_recently_updated` — Most Recently Updated Tokens
 
-Returns up to 100 tokens ordered by most recent metadata update, across all networks
-or filtered to one. Token objects are a subset of the full Token Info shape: `address`,
-`name`, `symbol`, `image_url`, `coingecko_coin_id`, `websites`, `description`,
-`gt_score`, `metadata_updated_at`. Full socials and holder data are not included.
+| Field | Value |
+|---|---|
+| Description | Up to 100 tokens ordered by most recent metadata update |
+| Path | `GET /onchain/tokens/info_recently_updated` |
+| Plan | Paid |
+
+### Parameters
 
 | Parameter | Type | Required | Description |
 |---|---|---|---|
 | `include` | string | No | `network` — sideloads network object under `included` |
 | `network` | string | No | Filter to a specific network ID |
 
+### Notes
+- Returns up to 100 tokens across all networks, or filtered to one network.
+- Token objects are a subset of the full Token Info shape — full socials and holder data are not included.
+
+### Response Fields
+
+| Field | Type | Description |
+|---|---|---|
+| `address` | string | Token contract address |
+| `name` | string | Token name |
+| `symbol` | string | Token symbol |
+| `image_url` | string | Token image URL |
+| `coingecko_coin_id` | string \| null | CoinGecko coin ID if listed |
+| `websites` | array | Official website URLs |
+| `description` | string | Token description |
+| `gt_score` | number | GeckoTerminal score (0–100) |
+| `metadata_updated_at` | string | ISO 8601 timestamp of most recent metadata update |
+
 ---
 
 ## `GET /onchain/networks/{network}/tokens/{address}/top_holders` — Top Token Holders
 
-**Paid only (Analyst, Lite, Pro, Enterprise).** Beta — data quality and coverage are
-still improving.
+| Field | Value |
+|---|---|
+| Description | Top holders by token balance for a given token address |
+| Path | `GET /onchain/networks/{network}/tokens/{address}/top_holders` |
+| Plan | Analyst, Lite, Pro, Enterprise |
 
-Supported chains: Solana, EVM (Ethereum, Polygon, BNB, Arbitrum, Optimism, Base),
-Sui, TON, Ronin.
+### Parameters
 
 | Parameter | Type | Required | Description |
 |---|---|---|---|
@@ -262,8 +341,11 @@ Sui, TON, Ronin.
 | `holders` | string | No | Number of holders to return, or `max`. Default: `10`. Max: 50 (non-Solana), 40 (Solana) |
 | `include_pnl_details` | boolean | No | Include PnL fields per holder. Default: `false` |
 
-### Response Fields
+### Notes
+- Beta — data quality and coverage are still improving.
+- Supported chains: Solana, EVM (Ethereum, Polygon, BNB, Arbitrum, Optimism, Base), Sui, TON, Ronin.
 
+### Example Response
 ```json
 {
   "data": {
@@ -294,6 +376,8 @@ Sui, TON, Ronin.
 }
 ```
 
+### Response Fields
+
 | Field | Type | Description |
 |---|---|---|
 | `rank` | number | Holder rank by token amount |
@@ -310,11 +394,15 @@ Sui, TON, Ronin.
 
 ---
 
-## `GET /onchain/networks/{network}/tokens/{token_address}/holders_chart` — Historical Holders Chart
+## `GET /onchain/networks/{network}/tokens/{token_address}/holders_chart` — Historical Token Holders Chart
 
-**Paid only (Analyst, Lite, Pro, Enterprise).** Beta.
+| Field | Value |
+|---|---|
+| Description | Time-series holder count snapshots for a token |
+| Path | `GET /onchain/networks/{network}/tokens/{token_address}/holders_chart` |
+| Plan | Analyst, Lite, Pro, Enterprise |
 
-Supported chains: same as top holders above.
+### Parameters
 
 | Parameter | Type | Required | Description |
 |---|---|---|---|
@@ -322,7 +410,10 @@ Supported chains: same as top holders above.
 | `token_address` | string | Yes | Token contract address |
 | `days` | string | No | `7` (default), `30`, `max` |
 
-**Granularity by `days`:** `7` → all data points (no fixed interval); `30` → daily (30 intervals); `max` → weekly.
+### Notes
+- Beta — data quality and coverage are still improving.
+- Supported chains: same as Top Token Holders above.
+- Granularity by `days`: `7` → all data points (no fixed interval); `30` → daily (30 intervals); `max` → weekly.
 
 ### Example Response
 ```json
@@ -348,16 +439,27 @@ Supported chains: same as top holders above.
 }
 ```
 
-`token_holders_list` entries are `[ISO 8601 timestamp (string), holder count (integer)]` pairs.
+### Response Fields
+
+| Field | Type | Description |
+|---|---|---|
+| `token_holders_list` | array | Array of `[ISO 8601 timestamp (string), holder count (integer)]` pairs |
+| `meta.token.address` | string | Token contract address |
+| `meta.token.name` | string | Token name |
+| `meta.token.symbol` | string | Token symbol |
+| `meta.token.coingecko_coin_id` | string \| null | CoinGecko coin ID if listed |
 
 ---
 
 ## `GET /onchain/networks/{network_id}/tokens/{token_address}/top_traders` — Top Token Traders
 
-**Paid only (Analyst, Lite, Pro, Enterprise).** Beta.
+| Field | Value |
+|---|---|
+| Description | Top traders by PnL or volume for a given token |
+| Path | `GET /onchain/networks/{network_id}/tokens/{token_address}/top_traders` |
+| Plan | Analyst, Lite, Pro, Enterprise |
 
-Constraints: only tokens created after 1 September 2023; stablecoins and wrapped
-native tokens (e.g. wSOL, wETH) are not supported.
+### Parameters
 
 | Parameter | Type | Required | Description |
 |---|---|---|---|
@@ -367,7 +469,12 @@ native tokens (e.g. wSOL, wETH) are not supported.
 | `sort` | string | No | `realized_pnl_usd_desc` (default), `unrealized_pnl_usd_desc`, `total_buy_usd_desc`, `total_sell_usd_desc` |
 | `include_address_label` | boolean | No | Include address label data. Default: `false` |
 
-### Trader Object Fields
+### Notes
+- Beta — data quality and coverage are still improving.
+- Only tokens created after 1 September 2023 are supported.
+- Stablecoins and wrapped native tokens (e.g. wSOL, wETH) are not supported.
+
+### Response Fields
 
 | Field | Type | Description |
 |---|---|---|
