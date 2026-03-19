@@ -92,6 +92,8 @@ known, or `GET /coins/list` in `references/coins.md` for the full ID map.
   - Above 90 days from now → daily (00:00 UTC)
 - `interval=5m` and `interval=hourly` (explicit) are **Enterprise only** and bypass auto-granularity.
 - Non-Enterprise subscribers wanting hourly data should leave `interval` empty and use a range of 2–90 days.
+- Cache / Update Frequency: every 30 seconds for all plans.
+- The last completed UTC day is available 10 minutes after midnight (00:10 UTC).
 
 ### Example Response
 ```json

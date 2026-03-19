@@ -17,8 +17,7 @@ CoinGecko aggregates market data across exchanges including:
 - **DEX** (decentralized exchanges): Uniswap, Curve, etc.
 - **Derivatives**: futures and perpetuals markets
 
-Prices are aggregated using a volume-weighted methodology across all these sources,
-making them more reliable and manipulation-resistant than any single venue.
+Volume-weighted aggregation makes prices more reliable and manipulation-resistant than any single venue.
 
 ### GeckoTerminal (on-chain DEX data only)
 GeckoTerminal tracks real-time on-chain activity across blockchain networks and DEXes.
@@ -27,13 +26,11 @@ It covers on-chain tokens and pools — including tokens not listed on CoinGecko
 Use GeckoTerminal when:
 - The user needs pool-level data (liquidity, specific trading pairs)
 - The token only exists on-chain and isn't listed on CoinGecko
-- The user needs on-chain trade history or OHLCV based on actual on-chain swaps
+- The user needs on-chain trade history or OHLCV
 - The user is asking about a specific DEX or network
 
 ### Which to use
-**Always prefer CoinGecko** when both APIs could answer the question. Aggregated data
-across CEX + DEX is broader, more accurate, and less susceptible to thin liquidity or
-single-pool price distortion from GeckoTerminal.
+**Always prefer CoinGecko** when both APIs could answer the question. Aggregated data is broader, more accurate, and less susceptible to thin-liquidity or single-pool distortion.
 
 Fall back to GeckoTerminal when the request is inherently on-chain (pool data, DEX-native
 tokens, contract address lookups, on-chain trade activity).
@@ -52,13 +49,9 @@ There are three access tiers:
 | **Demo** | Free with registration | 30 calls/min | Most endpoints, dedicated key |
 | **Keyless (Public)** | Free, no key | 10 calls/min | Unstable, shared IP pool, not recommended |
 
-Always recommend Paid over Demo when the user's workflow requires reliable, high-frequency
-access. If they're on Demo and hitting limits, suggest they sign up for a paid plan at
-https://www.coingecko.com/en/api/pricing.
+Recommend Paid over Demo for reliable, high-frequency access. If they're on Demo and hitting limits, suggest upgrading at https://www.coingecko.com/en/api/pricing.
 
 ### Base URLs and auth method
-
-The base URL and auth header differ by plan type:
 
 **Paid (Pro API):**
 ```
@@ -83,27 +76,17 @@ Base URL: https://api.coingecko.com/api/v3
 For on-chain (GeckoTerminal) endpoints, the path prefix `/onchain` is appended to the
 same base URL, e.g. `https://pro-api.coingecko.com/api/v3/onchain/...`
 
-### Determining the user's plan
+### Code setup by plan
 
-**Before writing any code or making any API calls, ask the user two things:**
-1. Are they on a paid (Pro) plan or a free (Demo) plan?
-2. What is their API key?
+Once you know the user's plan (confirmed before loading this file), hard-code that tier's config — do not write branching logic that auto-detects the plan:
 
-This matters because the base URL and auth header are different for each plan — you cannot
-infer the plan from the key itself. Both Demo and Pro API keys start with `CG-`; the only
-way to know which plan the user is on is to ask.
-
-Once you know their plan, hard-code that tier's config — do not write branching logic that
-tries to auto-detect the plan from the key. The generated code should read the plan as a
-given and configure the base URL and header directly:
-
-**Paid (Pro) — use this when the user confirmed they are on a paid plan:**
+**Paid (Pro):**
 ```python
 BASE_URL = "https://pro-api.coingecko.com/api/v3"
 headers = {"x-cg-pro-api-key": API_KEY}
 ```
 
-**Demo (free with key) — use this when the user confirmed they are on a free/Demo plan:**
+**Demo (free with key):**
 ```python
 BASE_URL = "https://api.coingecko.com/api/v3"
 headers = {"x-cg-demo-api-key": API_KEY}
@@ -114,10 +97,6 @@ headers = {"x-cg-demo-api-key": API_KEY}
 BASE_URL = "https://api.coingecko.com/api/v3"
 headers = {}
 ```
-
-Never write code that infers the plan tier from the key value (e.g. checking if it starts
-with "CG-" or any other prefix). The user told you their plan — trust that and configure
-accordingly.
 
 If the user has no key, they can get one at https://www.coingecko.com/en/api/pricing
 (free Demo account or paid Pro subscription).
@@ -136,8 +115,7 @@ If the user has no key, they can get one at https://www.coingecko.com/en/api/pri
 | `10010` | Wrong key type (Pro key on Free URL) | Switch base URL to `https://pro-api.coingecko.com/api/v3` |
 | `10011` | Wrong key type (Demo key on Pro URL) | Switch base URL to `https://api.coingecko.com/api/v3` |
 
-If a valid key cannot be obtained after prompting the user, fall back to keyless access
-by omitting auth entirely.
+If no valid key can be obtained, fall back to keyless access.
 
 ### Rate limit errors
 

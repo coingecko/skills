@@ -185,7 +185,7 @@ None.
 {
   "name": "Binance (Futures)",
   "open_interest_btc": 350139.89,
-  "trade_volume_24h_btc": "689202.84",
+  "trade_volume_24h_btc": 689202.84,
   "number_of_perpetual_pairs": 587,
   "number_of_futures_pairs": 38,
   "image": "https://coin-images.coingecko.com/markets/images/466/small/binance_futures.jpg",

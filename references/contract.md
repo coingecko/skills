@@ -57,7 +57,7 @@ Asset platform IDs can be resolved via `references/asset-platforms.md` →
 | `{vs_currency}` | Price in the requested currency |
 | `{vs_currency}_market_cap` | Market cap in the requested currency. Present when `include_market_cap=true` |
 | `{vs_currency}_24h_vol` | 24hr volume in the requested currency. Present when `include_24hr_vol=true` |
-| `{vs_currency}_24h_change` | 24hr price change in the requested currency. Present when `include_24hr_change=true` |
+| `{vs_currency}_24h_change` | 24hr price change %. Present when `include_24hr_change=true` |
 | `last_updated_at` | Last updated UNIX timestamp. Present when `include_last_updated_at=true` |
 
 ---
@@ -80,7 +80,7 @@ Asset platform IDs can be resolved via `references/asset-platforms.md` →
 ### Notes
 - Returns the same data structure as `GET /coins/{id}` in `references/coins.md`. Refer there for the full response field reference.
 - `twitter_followers` is no longer supported as of May 15, 2025.
-- Coin descriptions may contain `\r\n` escape sequences.
+- Coin descriptions may contain `\r\n` newline escape sequences.
 - Cache / Update Frequency: every 60 seconds for all plans.
 
 ### Example Response
@@ -135,7 +135,12 @@ See `references/coins.md` → `GET /coins/{id}` for the complete field reference
 | `precision` | string | No | Decimal places: `full` or `0`–`18` |
 
 ### Notes
-- Non-Enterprise subscribers wanting hourly data should leave `interval` empty and use `days` within 2–90.
+- Leave `interval` empty for automatic granularity based on the `days` value:
+  - 1 day from now → 5-minutely
+  - 2–90 days from now → hourly
+  - Above 90 days from now → daily (00:00 UTC)
+- `interval=5m` and `interval=hourly` (explicit) are **Enterprise only** and bypass auto-granularity.
+- Non-Enterprise subscribers wanting hourly data should leave `interval` empty and use a range of 2–90 days.
 - Cache / Update Frequency: every 5 minutes for all plans.
 - The last completed UTC day is available 35 minutes after midnight (00:35 UTC).
 
@@ -189,6 +194,11 @@ See `references/coins.md` → `GET /coins/{id}` for the complete field reference
 
 ### Notes
 - Use ISO date strings (`YYYY-MM-DD`) for best compatibility over UNIX timestamps.
+- Leave `interval` empty for automatic granularity based on the date range:
+  - 1 day → 5-minutely
+  - 1 day (not current) or 2–90 days → hourly
+  - Above 90 days → daily (00:00 UTC)
+- `interval=5m` and `interval=hourly` (explicit) are **Enterprise only**.
 - Non-Enterprise subscribers wanting hourly data should leave `interval` empty and use a range within 2–90 days.
 - Cache varies by range: 1 day → 30s, 2–90 days → 30 min, above 90 days → 12 hours.
 - The last completed UTC day is available 35 minutes after midnight (00:35 UTC).

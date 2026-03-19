@@ -71,7 +71,7 @@ if the target is known, or `GET /coins/list` in `references/coins.md` for the fu
 
 ### Notes
 - Use ISO date strings (`YYYY-MM-DD`) for best compatibility over UNIX timestamps.
-- Auto granularity applies based on the date range:
+- Automatic granularity applies based on the date range:
   - 1 day from now → 5-minutely
   - 2–90 days from now → hourly
   - 91 days and above from now → daily (00:00 UTC)
@@ -114,7 +114,7 @@ if the target is known, or `GET /coins/list` in `references/coins.md` for the fu
 | `interval` | string | No | Only `daily` is supported. Leave empty for auto granularity |
 
 ### Notes
-- Leave `interval` empty for auto granularity:
+- Leave `interval` empty for automatic granularity based on the `days` value:
   - 1 day from now → 5-minutely
   - 2–90 days from now → hourly
   - 91 days and above from now → daily (00:00 UTC)

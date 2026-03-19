@@ -189,7 +189,7 @@ endpoints in this file also accept derivatives exchange IDs.
 | `coin_ids` | string | No | Filter by CoinGecko coin IDs, comma-separated. Refer to `references/coins.md` → `GET /coins/list` |
 | `include_exchange_logo` | boolean | No | Include exchange logo URL. Default: `false` |
 | `page` | number | No | Page number for pagination |
-| `depth` | boolean | No | Include 2% orderbook depth (`cost_to_move_up_usd`, `cost_to_move_down_usd`). Default: `false` |
+| `depth` | boolean | No | Include 2% order book depth (`cost_to_move_up_usd`, `cost_to_move_down_usd`). Default: `false` |
 | `order` | string | No | Sort order. Default: `trust_score_desc`. Options: `trust_score_desc`, `trust_score_asc`, `volume_desc`, `volume_asc`, `market_cap_asc`, `market_cap_desc`, `base_target` |
 | `dex_pair_format` | string | No | DEX pair display format. Default: `contract_address`. Use `symbol` for readable symbols |
 
@@ -244,15 +244,15 @@ endpoints in this file also accept derivatives exchange IDs.
 | `tickers[].target` | Target currency symbol or contract address (DEX) |
 | `tickers[].market.name` | Exchange name |
 | `tickers[].market.identifier` | Exchange ID |
-| `tickers[].market.has_trading_incentive` | Whether trading incentives apply |
+| `tickers[].market.has_trading_incentive` | Whether the exchange offers trading incentives |
 | `tickers[].market.logo` | Exchange logo URL. Present when `include_exchange_logo=true` |
 | `tickers[].last` | Last traded price |
 | `tickers[].volume` | Trading volume |
-| `tickers[].cost_to_move_up_usd` | USD cost to move price up 2%. Present when `depth=true` |
-| `tickers[].cost_to_move_down_usd` | USD cost to move price down 2%. Present when `depth=true` |
-| `tickers[].converted_last` | Last price in BTC, ETH, USD |
-| `tickers[].converted_volume` | Volume in BTC, ETH, USD |
-| `tickers[].trust_score` | Ticker trust score |
+| `tickers[].cost_to_move_up_usd` | Cost to move price up 2% in USD. Present when `depth=true` |
+| `tickers[].cost_to_move_down_usd` | Cost to move price down 2% in USD. Present when `depth=true` |
+| `tickers[].converted_last` | Last price converted to BTC, ETH, USD |
+| `tickers[].converted_volume` | Volume converted to BTC, ETH, USD |
+| `tickers[].trust_score` | Ticker trust score (nullable) |
 | `tickers[].bid_ask_spread_percentage` | Bid-ask spread percentage |
 | `tickers[].timestamp` | Ticker timestamp |
 | `tickers[].last_traded_at` | Last trade timestamp |
@@ -323,10 +323,10 @@ endpoints in this file also accept derivatives exchange IDs.
 | `to` | number | Yes | End date as UNIX timestamp |
 
 ### Notes
-- Also accepts derivatives exchange IDs.
+- Also accepts derivatives exchange IDs (e.g. `binance_futures`).
 - Date range between `from` and `to` must be within **31 days**.
 - Data interval is fixed at **daily** — no granularity options.
-- Volume is denominated in BTC.
+- Volume is denominated in BTC. Use `GET /exchange_rates` in `references/utils.md` to convert.
 - Cache / Update Frequency: every 5 minutes.
 
 ### Example Response

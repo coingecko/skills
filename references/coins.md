@@ -123,7 +123,7 @@ Coin IDs referenced in these endpoints can be resolved via `GET /search` in `ref
 | `ids` | string | No | Filter by coin IDs (comma-separated). Use `references/utils.md` → `GET /search` if the target is known, or `GET /coins/list` (this file) for the full ID map |
 | `names` | string | No | Filter by coin names. URL-encode spaces |
 | `symbols` | string | No | Filter by coin symbols (comma-separated) |
-| `include_tokens` | string | No | For `symbols` lookup: `top` (default) or `all` (max 50 symbols) |
+| `include_tokens` | string | No | For `symbols` lookup: `top` (default, by market cap/volume) or `all` (all matches, max 50 symbols) |
 | `category` | string | No | Filter by category. Refer to `references/categories.md` → `GET /coins/categories/list`. Highest priority when combined with other lookup params |
 | `order` | string | No | Sort order: `market_cap_desc` (default), `market_cap_asc`, `volume_desc`, `volume_asc`, `id_asc`, `id_desc` |
 | `per_page` | number | No | Results per page: 1–250. Default: `100` |
@@ -219,7 +219,7 @@ Coin IDs referenced in these endpoints can be resolved via `GET /search` in `ref
 | `developer_data` | boolean | No | Include developer/repo data. Default: `true` |
 | `sparkline` | boolean | No | Include 7-day sparkline data. Default: `false` |
 | `include_categories_details` | boolean | No | Include detailed category objects (id + name). Default: `false` |
-| `dex_pair_format` | string | No | DEX ticker format: `contract_address` (default) or `symbol` |
+| `dex_pair_format` | string | No | DEX pair format: `contract_address` (default) or `symbol` |
 
 ### Notes
 - Tickers are limited to 100 items. Use `GET /coins/{id}/tickers` for full paginated tickers.
@@ -340,8 +340,8 @@ Coin IDs referenced in these endpoints can be resolved via `GET /search` in `ref
 | Field | Description |
 |---|---|
 | `name` | Coin name |
-| `tickers[].base` | Base currency of the trading pair |
-| `tickers[].target` | Target/quote currency |
+| `tickers[].base` | Base coin of the trading pair |
+| `tickers[].target` | Target coin of the trading pair |
 | `tickers[].market.name` | Exchange name |
 | `tickers[].market.identifier` | Exchange ID |
 | `tickers[].market.has_trading_incentive` | Whether the exchange offers trading incentives |
@@ -352,17 +352,17 @@ Coin IDs referenced in these endpoints can be resolved via `GET /search` in `ref
 | `tickers[].cost_to_move_down_usd` | Cost to move price down 2% in USD. Present when `depth=true` |
 | `tickers[].converted_last` | Last price converted to BTC, ETH, USD |
 | `tickers[].converted_volume` | Volume converted to BTC, ETH, USD |
-| `tickers[].trust_score` | Exchange trust score (nullable) |
-| `tickers[].bid_ask_spread_percentage` | Bid-ask spread % |
+| `tickers[].trust_score` | Ticker trust score (nullable) |
+| `tickers[].bid_ask_spread_percentage` | Bid-ask spread percentage |
 | `tickers[].timestamp` | Ticker timestamp |
 | `tickers[].last_traded_at` | Last trade timestamp |
-| `tickers[].last_fetch_at` | Last fetch timestamp |
+| `tickers[].last_fetch_at` | Last data fetch timestamp |
 | `tickers[].is_anomaly` | Whether the ticker is flagged as anomalous |
 | `tickers[].is_stale` | Whether the ticker data is stale |
-| `tickers[].trade_url` | Direct trading URL |
-| `tickers[].token_info_url` | Token info URL (nullable) |
-| `tickers[].coin_id` | Base currency coin ID |
-| `tickers[].target_coin_id` | Target currency coin ID |
+| `tickers[].trade_url` | Direct trade URL on the exchange |
+| `tickers[].token_info_url` | Token info URL (DEX only; `null` for CEX) |
+| `tickers[].coin_id` | CoinGecko coin ID for the base currency |
+| `tickers[].target_coin_id` | CoinGecko coin ID for the target currency |
 
 ---
 

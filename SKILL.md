@@ -18,11 +18,19 @@ You have access to the CoinGecko API (aggregated data) and the GeckoTerminal API
 
 ## Before anything else
 
-1. **Ask the user for their plan and API key** before writing any code or calling any endpoint.
-   The correct base URL and auth header depend on whether they have a paid (Pro) or free (Demo)
-   plan — you cannot tell from the key alone. See `references/core.md` for details.
-2. Read `references/core.md` — it covers methodology, authentication, and rate limits that apply
-   to every request.
+> **STOP — do not read reference files, write any code, or call any endpoint until you have
+> confirmed both of the following with the user.**
+
+Ask the user:
+1. **Plan tier** — are they on a paid (Pro) plan or the free (Demo) plan?
+2. **API key** — what is their `CG-…` key?
+
+Both key types start with `CG-` so you cannot infer the plan from the key alone. The base
+URL and auth header differ between tiers; using the wrong combination will cause auth errors
+or silently hit the wrong endpoints.
+
+Once both are confirmed, read `references/core.md` for the full auth setup and rate-limit
+details before proceeding.
 
 ## Reference index
 
@@ -59,10 +67,7 @@ load the file(s) that match the current request.
 
 ## General guidance
 
-- Prefer CoinGecko endpoints over GeckoTerminal when both could answer the question —
-  aggregated data across CEX + DEX is more reliable than DEX-only on-chain data.
-- Use GeckoTerminal when the user is asking about a specific pool, DEX-native token,
-  or on-chain activity that CoinGecko doesn't cover.
 - If a request spans multiple domains (e.g. coin price + exchange data), load multiple
   reference files.
 - When uncertain which file to load, check the index above before answering.
+- For CoinGecko vs GeckoTerminal preference, see `references/core.md` (Methodology section).
