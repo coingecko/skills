@@ -5,8 +5,6 @@ the user is asking about coin prices, market cap, volume, coin details, tickers,
 added coins, or top gainers/losers. For historical charts or OHLC data, see `references/coin-history.md`.
 For supply charts, see `references/coin-supply.md`. For contract address lookups, see `references/contract.md`.
 
-Coin IDs referenced in these endpoints can be resolved via `GET /search` in `references/utils.md` if the target coin is known, or `GET /coins/list` (this file) for the full ID map.
-
 ---
 
 ## `GET /simple/price` — Coin Price by IDs
@@ -15,14 +13,13 @@ Coin IDs referenced in these endpoints can be resolved via `GET /search` in `ref
 |---|---|
 | Description | Query prices of one or more coins by CoinGecko coin ID |
 | Path | `GET /simple/price` |
-| Plan | Free + Paid |
 
 ### Parameters
 
 | Parameter | Type | Required | Description |
 |---|---|---|---|
 | `vs_currencies` | string | Yes | Target currency (comma-separated for multiple). Refer to `references/utils.md` → `GET /simple/supported_vs_currencies` |
-| `ids` | string | No | Coin IDs (comma-separated). Use `references/utils.md` → `GET /search` if the target is known, or `GET /coins/list` (this file) for the full ID map. Priority: `ids` > `names` > `symbols` |
+| `ids` | string | No | Coin IDs (comma-separated). Priority: `ids` > `names` > `symbols` |
 | `names` | string | No | Coin names (comma-separated). URL-encode spaces (e.g. `Binance%20Coin`) |
 | `symbols` | string | No | Coin symbols (comma-separated) |
 | `include_tokens` | string | No | For `symbols` lookup: `top` (default, by market cap/volume) or `all` (all matches, max 50 symbols) |
@@ -35,7 +32,6 @@ Coin IDs referenced in these endpoints can be resolved via `GET /search` in `ref
 ### Notes
 - At least one of `ids`, `names`, or `symbols` is required.
 - To check for stale prices, use `include_last_updated_at=true` or check if `include_24hr_change` returns `null`.
-- Wildcard searches are not supported.
 
 ### Example Response
 ```json
@@ -68,7 +64,6 @@ Coin IDs referenced in these endpoints can be resolved via `GET /search` in `ref
 |---|---|
 | Description | Query all supported coins with ID, name, and symbol |
 | Path | `GET /coins/list` |
-| Plan | Free + Paid |
 
 ### Parameters
 
@@ -113,17 +108,16 @@ Coin IDs referenced in these endpoints can be resolved via `GET /search` in `ref
 |---|---|
 | Description | Query all supported coins with price, market cap, volume, and market data |
 | Path | `GET /coins/markets` |
-| Plan | Free + Paid |
 
 ### Parameters
 
 | Parameter | Type | Required | Description |
 |---|---|---|---|
 | `vs_currency` | string | Yes | Target currency. Refer to `references/utils.md` → `GET /simple/supported_vs_currencies` |
-| `ids` | string | No | Filter by coin IDs (comma-separated). Use `references/utils.md` → `GET /search` if the target is known, or `GET /coins/list` (this file) for the full ID map |
+| `ids` | string | No | Filter by coin IDs (comma-separated) |
 | `names` | string | No | Filter by coin names. URL-encode spaces |
 | `symbols` | string | No | Filter by coin symbols (comma-separated) |
-| `include_tokens` | string | No | For `symbols` lookup: `top` (default, by market cap/volume) or `all` (all matches, max 50 symbols) |
+| `include_tokens` | string | No | For `symbols` lookup: `top` (default) or `all` (max 50 symbols) |
 | `category` | string | No | Filter by category. Refer to `references/categories.md` → `GET /coins/categories/list`. Highest priority when combined with other lookup params |
 | `order` | string | No | Sort order: `market_cap_desc` (default), `market_cap_asc`, `volume_desc`, `volume_asc`, `id_asc`, `id_desc` |
 | `per_page` | number | No | Results per page: 1–250. Default: `100` |
@@ -132,11 +126,10 @@ Coin IDs referenced in these endpoints can be resolved via `GET /search` in `ref
 | `price_change_percentage` | string | No | Include price change % for timeframes (comma-separated): `1h`, `24h`, `7d`, `14d`, `30d`, `200d`, `1y` |
 | `locale` | string | No | Response language. Default: `en` |
 | `precision` | string | No | Decimal places: `full` or `0`–`18` |
-| `include_rehypothecated` | boolean | No | Include rehypothecated tokens. Default: `false`. Returns `market_cap_rank_with_rehypothecated` when `true` |
+| `include_rehypothecated` | boolean | No | Include rehypothecated tokens. Default: `false` |
 
 ### Notes
 - Lookup param priority: `category` > `ids` > `names` > `symbols`.
-- Wildcard searches are not supported.
 
 ### Example Response
 ```json
@@ -205,7 +198,6 @@ Coin IDs referenced in these endpoints can be resolved via `GET /search` in `ref
 |---|---|
 | Description | Query full metadata and market data for a coin by its CoinGecko ID |
 | Path | `GET /coins/{id}` |
-| Plan | Free + Paid |
 
 ### Parameters
 
@@ -224,7 +216,6 @@ Coin IDs referenced in these endpoints can be resolved via `GET /search` in `ref
 ### Notes
 - Tickers are limited to 100 items. Use `GET /coins/{id}/tickers` for full paginated tickers.
 - `market_data` contains prices, ATH, ATL, supply, and more across all supported currencies.
-- Community data for Telegram updates weekly. Reddit and Twitter community data are no longer supported.
 - Coin descriptions may contain `\r\n` newline escape sequences.
 
 ### Example Response
@@ -290,7 +281,6 @@ Coin IDs referenced in these endpoints can be resolved via `GET /search` in `ref
 |---|---|
 | Description | Query CEX and DEX tickers for a coin by ID, paginated |
 | Path | `GET /coins/{id}/tickers` |
-| Plan | Free + Paid |
 
 ### Parameters
 
@@ -372,7 +362,6 @@ Coin IDs referenced in these endpoints can be resolved via `GET /search` in `ref
 |---|---|
 | Description | Query the top 30 coins with largest price gain and loss by time duration |
 | Path | `GET /coins/top_gainers_losers` |
-| Plan | **Paid only** (Analyst, Lite, Pro, Enterprise) |
 
 ### Parameters
 
@@ -444,7 +433,6 @@ Coin IDs referenced in these endpoints can be resolved via `GET /search` in `ref
 |---|---|
 | Description | Query the latest coins recently listed on CoinGecko |
 | Path | `GET /coins/list/new` |
-| Plan | **Paid only** (Analyst, Lite, Pro, Enterprise) |
 
 ### Parameters
 

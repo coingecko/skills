@@ -30,8 +30,6 @@ OHLCV data for a specific pool. Use when a precise price source is required.
 
 ### `GET /onchain/networks/{network}/tokens/{token_address}/ohlcv/{timeframe}` — Token OHLCV
 
-**Paid only (Analyst, Lite, Pro, Enterprise).**
-
 Same parameters and response shape as Pool OHLCV, sourced from the token's most
 liquid pool. Supports an additional parameter:
 
@@ -54,7 +52,7 @@ To verify which pool is being used, call `references/onchain-tokens.md` →
 
 ### OHLCV Notes
 
-- **Historical depth**: Analyst plan and above can access data from September 2021 to present. Each request covers a maximum range of 6 months. Use `before_timestamp` in successive requests to retrieve older data.
+- **Historical depth**: Higher-tier plans can access data from September 2021 to present. Each request covers a maximum range of 6 months. Use `before_timestamp` in successive requests to retrieve older data.
 - **Skipped intervals**: By default (`include_empty_intervals=false`), intervals with no swaps are omitted. Higher-granularity timeframes (e.g. 1 minute) skip intervals more frequently.
 - **Empty interval fill** (when `include_empty_intervals=true`): OHLC is set to the previous interval's close price (O = H = L = C = prev_close); volume is set to `0`.
 - Timestamps are UNIX epoch seconds.
@@ -98,7 +96,7 @@ Each entry in `ohlcv_list` is a 6-element array: `[timestamp, open, high, low, c
 
 ### `GET /onchain/networks/{network}/pools/{pool_address}/trades` — Pool Trades
 
-Last 300 trades within the past 24 hours for a specific pool. Real-time (cacheless) for all paid plans.
+Last 300 trades within the past 24 hours for a specific pool.
 
 | Parameter | Type | Required | Description |
 |---|---|---|---|
@@ -110,8 +108,6 @@ Last 300 trades within the past 24 hours for a specific pool. Real-time (cachele
 ---
 
 ### `GET /onchain/networks/{network}/tokens/{token_address}/trades` — Token Trades
-
-**Paid only (Analyst, Lite, Pro, Enterprise).** Real-time (cacheless).
 
 Last 300 trades within the past 24 hours across **all pools** for a token. Includes
 `pool_address` and `pool_dex` fields not present in the pool trades endpoint.

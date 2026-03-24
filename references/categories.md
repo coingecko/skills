@@ -16,7 +16,6 @@ categories. For on-chain pool categories, see `references/onchain-categories.md`
 |---|---|
 | Description | Query all CoinGecko coin category IDs and names |
 | Path | `GET /coins/categories/list` |
-| Plan | Free + Paid |
 
 ### Parameters
 
@@ -24,7 +23,6 @@ None.
 
 ### Notes
 - Use `category_id` values from this endpoint as the `category` filter param in `references/coins.md` → `GET /coins/markets`.
-- Cache / Update Frequency: every 5 minutes for all plans.
 
 ### Example Response
 ```json
@@ -49,16 +47,12 @@ None.
 |---|---|
 | Description | Query all CoinGecko coin categories with market cap, volume, and top coins |
 | Path | `GET /coins/categories` |
-| Plan | Free + Paid |
 
 ### Parameters
 
 | Parameter | Type | Required | Description |
 |---|---|---|---|
 | `order` | string | No | Sort order. Default: `market_cap_desc`. Options: `market_cap_desc`, `market_cap_asc`, `name_desc`, `name_asc`, `market_cap_change_24h_desc`, `market_cap_change_24h_asc` |
-
-### Notes
-- Cache / Update Frequency: every 5 minutes for all plans.
 
 ### Example Response
 ```json

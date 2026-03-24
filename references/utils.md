@@ -13,7 +13,6 @@ values to other currencies.
 |---|---|
 | Description | Check whether the CoinGecko API server is online |
 | Path | `GET /ping` |
-| Plan | Free + Paid |
 
 ### Parameters
 
@@ -38,7 +37,6 @@ None.
 |---|---|
 | Description | Monitor API key usage including rate limits, monthly credits, and remaining credits |
 | Path | `GET /key` |
-| Plan | **Paid only** (Analyst, Lite, Pro, Enterprise) |
 
 ### Parameters
 
@@ -72,8 +70,8 @@ None.
 | `monthly_call_credit` | Plan-level monthly credit allowance |
 | `current_total_monthly_calls` | Total API calls made this month |
 | `current_remaining_monthly_calls` | Remaining monthly credits |
-| `api_key_rate_limit_request_per_minute` | Rate limit for this specific API key (may differ from plan default) |
-| `api_key_monthly_call_credit` | Monthly credit limit for this specific API key (may differ from plan default) |
+| `api_key_rate_limit_request_per_minute` | Rate limit for this specific API key |
+| `api_key_monthly_call_credit` | Monthly credit limit for this specific API key |
 
 ---
 
@@ -83,7 +81,6 @@ None.
 |---|---|
 | Description | Query all currencies supported as `vs_currency` or `vs_currencies` params across endpoints |
 | Path | `GET /simple/supported_vs_currencies` |
-| Plan | Free + Paid |
 
 ### Parameters
 
@@ -92,7 +89,6 @@ None.
 ### Notes
 - Use values from this endpoint wherever an endpoint accepts `vs_currency` or `vs_currencies`.
 - Includes fiat currencies (e.g. `usd`, `eur`, `jpy`), cryptocurrencies (e.g. `btc`, `eth`, `sol`), and commodities (e.g. `xau`, `xag`).
-- Cache / Update Frequency: every 60 seconds (Analyst, Lite, Pro, Enterprise).
 
 ### Example Response
 ```json
@@ -107,7 +103,6 @@ None.
 |---|---|
 | Description | Search for coins, exchanges, categories, and NFTs by name or symbol |
 | Path | `GET /search` |
-| Plan | Free + Paid |
 
 ### Parameters
 
@@ -119,7 +114,6 @@ None.
 - Results are sorted by market cap descending.
 - Use this endpoint to resolve a coin ID when the target coin is known by name or
   symbol. For the full ID list, use `references/coins.md` → `GET /coins/list`.
-- Cache / Update Frequency: every 15 minutes for all plans.
 
 ### Example Response
 ```json
@@ -179,7 +173,6 @@ None.
 | `nfts[].name` | NFT collection name |
 | `nfts[].symbol` | NFT collection symbol |
 | `nfts[].thumb` | NFT collection thumbnail URL |
-| `icos` | ICO results (typically empty) |
 
 ---
 
@@ -189,14 +182,10 @@ None.
 |---|---|
 | Description | Query the top 7 trending coins, top 3 trending NFTs, and top 6 trending categories on CoinGecko in the last 24 hours |
 | Path | `GET /search/trending` |
-| Plan | Free + Paid |
 
 ### Parameters
 
 None.
-
-### Notes
-- Cache / Update Frequency: every 10 minutes for all plans.
 
 ### Example Response
 ```json
@@ -305,7 +294,6 @@ None.
 |---|---|
 | Description | Query BTC exchange rates against all supported currencies |
 | Path | `GET /exchange_rates` |
-| Plan | Free + Paid |
 
 ### Parameters
 
@@ -314,7 +302,6 @@ None.
 ### Notes
 - Use this endpoint to convert BTC-denominated values returned by exchange volume
   chart and derivatives endpoints into other currencies.
-- Cache / Update Frequency: every 5 minutes for all plans.
 
 ### Example Response
 ```json

@@ -21,7 +21,6 @@ Do not use CoinGecko asset platform IDs directly in GeckoTerminal onchain endpoi
 |---|---|
 | Description | Query all asset platforms on CoinGecko, including their IDs and chain metadata |
 | Path | `GET /asset_platforms` |
-| Plan | Free + Paid |
 
 ### Parameters
 
@@ -31,7 +30,6 @@ Do not use CoinGecko asset platform IDs directly in GeckoTerminal onchain endpoi
 
 ### Notes
 - Use this endpoint to resolve asset platform IDs for contract address endpoints and NFT endpoints.
-- Cache / Update Frequency: every 60 seconds (Analyst, Lite, Pro, Enterprise).
 
 ### Example Response
 ```json
@@ -70,7 +68,6 @@ Do not use CoinGecko asset platform IDs directly in GeckoTerminal onchain endpoi
 |---|---|
 | Description | Get the full token list for a blockchain network in Ethereum token list standard format |
 | Path | `GET /token_lists/{asset_platform_id}/all.json` |
-| Plan | Free + Paid |
 
 ### Parameters
 
@@ -81,7 +78,6 @@ Do not use CoinGecko asset platform IDs directly in GeckoTerminal onchain endpoi
 ### Notes
 - Only tokens whose contract addresses have been verified by the CoinGecko team are included.
 - Response conforms to the [Ethereum token list standard](https://tokenlists.org/).
-- Cache / Update Frequency: every 5 minutes.
 
 ### Example Response
 ```json

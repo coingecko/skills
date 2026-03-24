@@ -8,25 +8,31 @@ and rate limits — read this before making any API call.
 ## Methodology: CoinGecko vs GeckoTerminal
 
 ### CoinGecko (aggregated data)
-Aggregates market data across CEX, DEX,
-and derivatives markets. Volume-weighted aggregation makes prices more reliable and
-manipulation-resistant than any single venue.
+Covers tens of thousands of coins, each reviewed by the CoinGecko team before listing.
+Aggregates market data across CEX, DEX, and derivatives markets — volume-weighted
+aggregation makes prices more reliable and manipulation-resistant than any single venue.
+Best suited for well-known assets (Bitcoin, Ethereum, Solana, major memecoins, etc.) and
+broad market overviews like top coins by market cap, category rankings, and global stats.
 
 ### GeckoTerminal (on-chain DEX data only)
-Tracks real-time on-chain activity across blockchain networks and DEXes, including tokens
-not listed on CoinGecko.
+Covers tens of millions of tokens and pools, listed automatically from on-chain activity
+— no review gate. Includes the full long tail: newly launched tokens, micro-cap coins,
+and pools that don't meet CoinGecko's listing criteria. Tracks real-time on-chain
+activity across blockchain networks and DEXes.
 
 Use GeckoTerminal when:
 - The user needs pool-level data (liquidity, specific trading pairs)
-- The token only exists on-chain and isn't listed on CoinGecko
+- The token is long-tail or newly launched and isn't listed on CoinGecko
 - The user needs on-chain trade history or OHLCV
 - The user is asking about a specific DEX or network
 
 ### Which to use
-**Prefer CoinGecko** when both APIs could answer the question. Aggregated data is broader, more accurate, and less susceptible to thin-liquidity or single-pool distortion.
+**Prefer CoinGecko** when both APIs could answer the question — aggregated data is
+broader, more accurate, and less susceptible to thin-liquidity or single-pool distortion.
 
 Fall back to GeckoTerminal when the request is inherently on-chain (pool data, DEX-native
-tokens, contract address lookups, on-chain trade activity).
+tokens, contract address lookups, on-chain trade activity) or targets tokens not listed
+on CoinGecko.
 
 ---
 
@@ -54,6 +60,40 @@ Use header or query param — not both.
 
 For GeckoTerminal endpoints, append `/onchain` to the base URL —
 e.g. `https://pro-api.coingecko.com/api/v3/onchain/...`
+
+---
+
+## Common conventions
+
+These patterns recur across many endpoints and are documented here once to avoid repetition.
+
+### Coin ID resolution
+Use `GET /search` (in `references/utils.md`) when you know the coin name or symbol, or
+`GET /coins/list` (in `references/coins.md`) for the full ID map.
+
+### Date parameters
+Use ISO date strings (`YYYY-MM-DD` or `YYYY-MM-DDTHH:MM`) for best compatibility over
+UNIX timestamps in all endpoints that accept `from`/`to` params.
+
+### Auto-granularity for chart endpoints
+When an `interval` param is left empty, granularity is determined automatically by the
+date range:
+- 1 day → 5-minutely
+- 2–90 days → hourly
+- Above 90 days → daily (00:00 UTC)
+
+You may bypass auto-granularity by setting `interval` explicitly:
+- `interval=daily` — daily historical data.
+- `interval=hourly` — hourly historical data, up to the **past 100 days**.
+- `interval=5m` — 5-minutely historical data, up to the **past 10 days** (or up to **any 10-day** date range per request). Exclusive to Enterprise subscribers.
+
+### Data availability
+The last completed UTC day is typically available 10–35 minutes after midnight UTC,
+depending on the endpoint.
+
+### BTC-denominated values
+Exchange and derivatives volume endpoints return values in BTC. Use `GET /exchange_rates`
+(in `references/utils.md`) to convert to other currencies.
 
 ---
 

@@ -5,9 +5,6 @@ when the user is asking about historical charts, time-series prices, OHLC candle
 or data over a specific date range. For current market data, see `references/coins.md`.
 For supply charts, see `references/coin-supply.md`.
 
-Coin IDs can be resolved via `GET /search` in `references/utils.md` if the target is
-known, or `GET /coins/list` in `references/coins.md` for the full ID map.
-
 ---
 
 ## `GET /coins/{id}/history` — Coin Historical Data by ID
@@ -16,7 +13,6 @@ known, or `GET /coins/list` in `references/coins.md` for the full ID map.
 |---|---|
 | Description | Query historical price, market cap, and 24hr volume for a coin at a specific date |
 | Path | `GET /coins/{id}/history` |
-| Plan | Free + Paid |
 
 ### Parameters
 
@@ -28,7 +24,6 @@ known, or `GET /coins/list` in `references/coins.md` for the full ID map.
 
 ### Notes
 - Data is returned at `00:00:00 UTC` for the given date.
-- The last completed UTC day is available 35 minutes after midnight (00:35 UTC).
 
 ### Example Response
 ```json
@@ -73,7 +68,6 @@ known, or `GET /coins/list` in `references/coins.md` for the full ID map.
 |---|---|
 | Description | Query historical price, market cap, and 24hr volume time-series up to N days ago |
 | Path | `GET /coins/{id}/market_chart` |
-| Plan | Free + Paid |
 
 ### Parameters
 
@@ -82,44 +76,15 @@ known, or `GET /coins/list` in `references/coins.md` for the full ID map.
 | `id` | string | Yes (path) | CoinGecko coin ID |
 | `vs_currency` | string | Yes | Target currency. Refer to `references/utils.md` → `GET /simple/supported_vs_currencies` |
 | `days` | string | Yes | Number of days ago (`1`, `7`, `14`, `30`, `90`, `180`, `365`, or `max`) |
-| `interval` | string | No | Explicit granularity override — omit for auto (recommended). Options: `daily` (all plans), `5m` (**Enterprise only** — max 10 days back), `hourly` (**Enterprise only** — max 100 days back). Without this param, auto-granularity applies: 1 day → 5-minutely, 2–90 days → hourly, 90+ days → daily |
+| `interval` | string | No | Explicit granularity override — omit for auto (recommended). Options: `daily`, `5m`, `hourly`. See `references/core.md` → Auto-granularity |
 | `precision` | string | No | Decimal places: `full` or `0`–`18` |
 
 ### Notes
-- Leave `interval` empty for automatic granularity based on the `days` value:
-  - 1 day from now → 5-minutely
-  - 2–90 days from now → hourly
-  - Above 90 days from now → daily (00:00 UTC)
-- `interval=5m` and `interval=hourly` (explicit) are **Enterprise only** and bypass auto-granularity.
-- Non-Enterprise subscribers wanting hourly data should leave `interval` empty and use a range of 2–90 days.
-- Cache / Update Frequency: every 30 seconds for all plans.
-- The last completed UTC day is available 10 minutes after midnight (00:10 UTC).
+- Leave `interval` empty for automatic granularity (see `references/core.md`).
 
-### Example Response
-```json
-{
-  "prices": [
-    [1711843200000, 69702.31],
-    [1711929600000, 71246.95]
-  ],
-  "market_caps": [
-    [1711843200000, 1370247487960.09],
-    [1711929600000, 1401370211582.37]
-  ],
-  "total_volumes": [
-    [1711843200000, 16408802301.84],
-    [1711929600000, 19723005998.22]
-  ]
-}
-```
+### Response
 
-### Response Fields
-
-| Field | Description |
-|---|---|
-| `prices` | Array of `[UNIX timestamp (ms), price]` pairs |
-| `market_caps` | Array of `[UNIX timestamp (ms), market cap]` pairs |
-| `total_volumes` | Array of `[UNIX timestamp (ms), 24hr volume]` pairs |
+Returns `prices`, `market_caps`, and `total_volumes` — each an array of `[UNIX timestamp (ms), value]` pairs. See example under `market_chart/range` below.
 
 ---
 
@@ -129,7 +94,6 @@ known, or `GET /coins/list` in `references/coins.md` for the full ID map.
 |---|---|
 | Description | Query historical price, market cap, and 24hr volume within a specific date range |
 | Path | `GET /coins/{id}/market_chart/range` |
-| Plan | Free + Paid |
 
 ### Parameters
 
@@ -137,21 +101,13 @@ known, or `GET /coins/list` in `references/coins.md` for the full ID map.
 |---|---|---|---|
 | `id` | string | Yes (path) | CoinGecko coin ID |
 | `vs_currency` | string | Yes | Target currency. Refer to `references/utils.md` → `GET /simple/supported_vs_currencies` |
-| `from` | string | Yes | Start date as ISO string (`YYYY-MM-DD` or `YYYY-MM-DDTHH:MM`, recommended) or UNIX timestamp |
-| `to` | string | Yes | End date as ISO string (`YYYY-MM-DD` or `YYYY-MM-DDTHH:MM`, recommended) or UNIX timestamp |
-| `interval` | string | No | Explicit granularity override — omit for auto (recommended). Options: `daily` (all plans), `5m` (**Enterprise only** — max 10-day range), `hourly` (**Enterprise only** — max 100-day range). Without this param, auto-granularity applies: 1 day → 5-minutely, 2–90 days → hourly, 90+ days → daily |
+| `from` | string | Yes | Start date — ISO string (`YYYY-MM-DD`) recommended, or UNIX timestamp |
+| `to` | string | Yes | End date — ISO string (`YYYY-MM-DD`) recommended, or UNIX timestamp |
+| `interval` | string | No | Explicit granularity override — omit for auto (recommended). Options: `daily`, `5m`, `hourly`. See `references/core.md` → Auto-granularity |
 | `precision` | string | No | Decimal places: `full` or `0`–`18` |
 
 ### Notes
-- Use ISO date strings (`YYYY-MM-DD`) for best compatibility over UNIX timestamps.
-- Leave `interval` empty for automatic granularity based on the date range:
-  - 1 day → 5-minutely
-  - 1 day (not current) or 2–90 days → hourly
-  - Above 90 days → daily (00:00 UTC)
-- `interval=5m` and `interval=hourly` (explicit) are **Enterprise only**.
-- Non-Enterprise subscribers wanting hourly data should leave `interval` empty and use a range within 2–90 days.
-- Cache varies by range: 1 day → 30s, 2–90 days → 30 min, above 90 days → 12 hours.
-- The last completed UTC day is available 35 minutes after midnight (00:35 UTC).
+- Leave `interval` empty for automatic granularity (see `references/core.md`).
 
 ### Example Response
 ```json
@@ -181,44 +137,20 @@ known, or `GET /coins/list` in `references/coins.md` for the full ID map.
 
 ---
 
-## `GET /coins/{id}/ohlc` — Coin OHLC Chart by ID
+## OHLC Endpoints
 
-| Field | Value |
-|---|---|
-| Description | Query OHLC candlestick data for a coin up to N days ago |
-| Path | `GET /coins/{id}/ohlc` |
-| Plan | Free + Paid |
+Both OHLC endpoints return the same response format: an array of 5-element arrays.
 
-### Parameters
+### OHLC Response Format
 
-| Parameter | Type | Required | Description |
-|---|---|---|---|
-| `id` | string | Yes (path) | CoinGecko coin ID |
-| `vs_currency` | string | Yes | Target currency. Refer to `references/utils.md` → `GET /simple/supported_vs_currencies` |
-| `days` | string | Yes | Number of days ago: `1`, `7`, `14`, `30`, `90`, `180`, `365`, or `max` |
-| `interval` | string | No | Candle interval: `daily` (paid — valid for `1/7/14/30/90/180` days only) or `hourly` (paid — valid for `1/7/14/30/90` days only). Leave empty for auto granularity (free + paid) |
-| `precision` | string | No | Decimal places: `full` or `0`–`18` |
-
-### Notes
-- `interval=daily` and `interval=hourly` are available to **all paid plan subscribers** (Analyst, Lite, Pro, Enterprise).
-- Leaving `interval` empty uses auto granularity available to all plans:
-  - 1–2 days → 30-minute candles
-  - 3–30 days → 4-hour candles
-  - 31 days and above → 4-day candles
-- Timestamp in the response indicates the **close** time of each candle.
-
-### Example Response
 ```json
 [
   [1709395200000, 61942, 62211, 61721, 61845],
-  [1709409600000, 61828, 62139, 61726, 62139],
-  [1709424000000, 62171, 62210, 61821, 62068]
+  [1709409600000, 61828, 62139, 61726, 62139]
 ]
 ```
 
-### Response Fields
-
-| Field | Description |
+| Index | Description |
 |---|---|
 | `[0]` | UNIX timestamp in milliseconds (close time of the candle) |
 | `[1]` | Open price |
@@ -228,13 +160,12 @@ known, or `GET /coins/list` in `references/coins.md` for the full ID map.
 
 ---
 
-## `GET /coins/{id}/ohlc/range` — Coin OHLC Chart within Time Range by ID
+## `GET /coins/{id}/ohlc` — Coin OHLC Chart by ID
 
 | Field | Value |
 |---|---|
-| Description | Query OHLC candlestick data for a coin within a specific date range |
-| Path | `GET /coins/{id}/ohlc/range` |
-| Plan | **Paid only** (Analyst, Lite, Pro, Enterprise) |
+| Description | Query OHLC candlestick data for a coin up to N days ago |
+| Path | `GET /coins/{id}/ohlc` |
 
 ### Parameters
 
@@ -242,30 +173,34 @@ known, or `GET /coins/list` in `references/coins.md` for the full ID map.
 |---|---|---|---|
 | `id` | string | Yes (path) | CoinGecko coin ID |
 | `vs_currency` | string | Yes | Target currency. Refer to `references/utils.md` → `GET /simple/supported_vs_currencies` |
-| `from` | string | Yes | Start date as ISO string (`YYYY-MM-DD` or `YYYY-MM-DDTHH:MM`, recommended) or UNIX timestamp |
-| `to` | string | Yes | End date as ISO string (`YYYY-MM-DD` or `YYYY-MM-DDTHH:MM`, recommended) or UNIX timestamp |
-| `interval` | string | Yes | Candle interval: `daily` (max 180 days / 180 candles per request) or `hourly` (max 31 days / 744 candles per request) |
+| `days` | string | Yes | Number of days ago: `1`, `7`, `14`, `30`, `90`, `180`, `365`, or `max` |
+| `interval` | string | No | Candle interval: `daily` or `hourly`. Leave empty for auto granularity |
+| `precision` | string | No | Decimal places: `full` or `0`–`18` |
 
 ### Notes
-- Use ISO date strings (`YYYY-MM-DD`) for best compatibility over UNIX timestamps.
-- Timestamp in the response indicates the **close** time of each candle.
-- Data available from 9 February 2018 onwards.
+- Leaving `interval` empty uses auto granularity:
+  - 1–2 days → 30-minute candles
+  - 3–30 days → 4-hour candles
+  - 31 days and above → 4-day candles
 
-### Example Response
-```json
-[
-  [1709395200000, 61942, 62211, 61721, 61845],
-  [1709409600000, 61828, 62139, 61726, 62139],
-  [1709424000000, 62171, 62210, 61821, 62068]
-]
-```
+---
 
-### Response Fields
+## `GET /coins/{id}/ohlc/range` — Coin OHLC Chart within Time Range by ID
 
-| Field | Description |
+| Field | Value |
 |---|---|
-| `[0]` | UNIX timestamp in milliseconds (close time of the candle) |
-| `[1]` | Open price |
-| `[2]` | High price |
-| `[3]` | Low price |
-| `[4]` | Close price |
+| Description | Query OHLC candlestick data for a coin within a specific date range |
+| Path | `GET /coins/{id}/ohlc/range` |
+
+### Parameters
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `id` | string | Yes (path) | CoinGecko coin ID |
+| `vs_currency` | string | Yes | Target currency. Refer to `references/utils.md` → `GET /simple/supported_vs_currencies` |
+| `from` | string | Yes | Start date — ISO string (`YYYY-MM-DD`) recommended, or UNIX timestamp |
+| `to` | string | Yes | End date — ISO string (`YYYY-MM-DD`) recommended, or UNIX timestamp |
+| `interval` | string | Yes | Candle interval: `daily` (max 180 days / 180 candles) or `hourly` (max 31 days / 744 candles) |
+
+### Notes
+- Data available from 9 February 2018 onwards.

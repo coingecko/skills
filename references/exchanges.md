@@ -5,8 +5,6 @@ when the user asks about exchanges, trading pairs, tickers, exchange volume, or 
 to resolve an exchange ID.
 
 Exchange IDs are also required by `references/derivatives.md` volume chart endpoints.
-To convert BTC-denominated volume to other currencies, use `references/utils.md` →
-`GET /exchange_rates`.
 
 Note: For derivatives exchanges (e.g. `bitmex`, `binance_futures`), exchange data and
 ticker endpoints are in `references/derivatives.md`. However, exchange IDs for
@@ -21,7 +19,6 @@ endpoints in this file also accept derivatives exchange IDs.
 |---|---|
 | Description | Query all exchange IDs and names, including derivatives exchanges |
 | Path | `GET /exchanges/list` |
-| Plan | Free + Paid |
 
 ### Parameters
 
@@ -32,7 +29,6 @@ endpoints in this file also accept derivatives exchange IDs.
 ### Notes
 - Covers both spot and derivatives exchanges. Use `id` values from this endpoint across all exchange and derivatives exchange endpoints.
 - No pagination required.
-- Cache / Update Frequency: every 5 minutes for all plans.
 
 ### Example Response
 ```json
@@ -57,7 +53,6 @@ endpoints in this file also accept derivatives exchange IDs.
 |---|---|
 | Description | Query all active exchanges with metadata and 24hr BTC volume |
 | Path | `GET /exchanges` |
-| Plan | Free + Paid |
 
 ### Parameters
 
@@ -67,9 +62,8 @@ endpoints in this file also accept derivatives exchange IDs.
 | `page` | number | No | Page number. Default: `1` |
 
 ### Notes
-- Only exchanges with active trading volume are included. Inactive or deactivated exchanges are excluded.
-- Volume is denominated in BTC. Use `GET /exchange_rates` in `references/utils.md` to convert.
-- Cache / Update Frequency: every 60 seconds for all plans.
+- Only exchanges with active trading volume are included.
+- Volume is denominated in BTC (see `references/core.md` → BTC-denominated values).
 
 ### Example Response
 ```json
@@ -114,21 +108,18 @@ endpoints in this file also accept derivatives exchange IDs.
 |---|---|
 | Description | Query a single exchange's metadata, 24hr BTC volume, and top 100 tickers |
 | Path | `GET /exchanges/{id}` |
-| Plan | Free + Paid |
 
 ### Parameters
 
 | Parameter | Type | Required | Description |
 |---|---|---|---|
 | `id` | string | Yes (path) | Exchange ID. Refer to `GET /exchanges/list` above |
-| `dex_pair_format` | string | No | DEX pair display format. Default: `contract_address`. Use `symbol` to show symbols (e.g. `WETH`, `USDC`) instead |
+| `dex_pair_format` | string | No | DEX pair display format. Default: `contract_address`. Use `symbol` to show symbols instead |
 
 ### Notes
 - Tickers are capped at 100. For more tickers, use `GET /exchanges/{id}/tickers` below.
 - For derivatives exchanges, use `references/derivatives.md` → `GET /derivatives/exchanges/{id}` instead.
-- `trade_volume_24h_btc_normalized` is no longer supported as of June 16, 2025.
-- Volume is denominated in BTC. Use `GET /exchange_rates` in `references/utils.md` to convert.
-- Cache / Update Frequency: every 60 seconds for all plans.
+- Volume is denominated in BTC (see `references/core.md` → BTC-denominated values).
 
 ### Example Response
 ```json
@@ -179,14 +170,13 @@ endpoints in this file also accept derivatives exchange IDs.
 |---|---|
 | Description | Query all tickers for an exchange, paginated at 100 per page |
 | Path | `GET /exchanges/{id}/tickers` |
-| Plan | Free + Paid |
 
 ### Parameters
 
 | Parameter | Type | Required | Description |
 |---|---|---|---|
 | `id` | string | Yes (path) | Exchange ID. Refer to `GET /exchanges/list` above |
-| `coin_ids` | string | No | Filter by CoinGecko coin IDs, comma-separated. Refer to `references/coins.md` → `GET /coins/list` |
+| `coin_ids` | string | No | Filter by CoinGecko coin IDs, comma-separated |
 | `include_exchange_logo` | boolean | No | Include exchange logo URL. Default: `false` |
 | `page` | number | No | Page number for pagination |
 | `depth` | boolean | No | Include 2% order book depth (`cost_to_move_up_usd`, `cost_to_move_down_usd`). Default: `false` |
@@ -195,8 +185,7 @@ endpoints in this file also accept derivatives exchange IDs.
 
 ### Notes
 - Results are paginated at 100 tickers per page.
-- Use `order=base_target` for stable pagination — sorts by base then target symbol lexicographically, minimising duplicates or gaps across pages.
-- Cache / Update Frequency: every 60 seconds (Analyst, Lite, Pro, Enterprise).
+- Use `order=base_target` for stable pagination — sorts by base then target symbol lexicographically.
 
 ### Example Response
 ```json
@@ -267,42 +256,44 @@ endpoints in this file also accept derivatives exchange IDs.
 
 ---
 
+## Volume Chart Endpoints
+
+Both volume chart endpoints return the same response format and accept derivatives
+exchange IDs (e.g. `binance_futures`). Volume is denominated in BTC (see
+`references/core.md` → BTC-denominated values).
+
+### Volume Chart Response Format
+
+```json
+[
+  [1711792200000, "306800.05"],
+  [1711795800000, "302561.82"]
+]
+```
+
+| Index | Description |
+|---|---|
+| `[0]` | UNIX timestamp in milliseconds |
+| `[1]` | Trading volume in BTC (string) |
+
+---
+
 ## `GET /exchanges/{id}/volume_chart` — Exchange Volume Chart by ID
 
 | Field | Value |
 |---|---|
 | Description | Query historical trading volume time-series in BTC for an exchange |
 | Path | `GET /exchanges/{id}/volume_chart` |
-| Plan | Free + Paid |
 
 ### Parameters
 
 | Parameter | Type | Required | Description |
 |---|---|---|---|
-| `id` | string | Yes (path) | Exchange ID or derivatives exchange ID. Refer to `GET /exchanges/list` above |
+| `id` | string | Yes (path) | Exchange ID or derivatives exchange ID |
 | `days` | string | Yes | Number of days ago: `1`, `7`, `14`, `30`, `90`, `180`, or `365` |
 
 ### Notes
-- Also accepts derivatives exchange IDs (e.g. `binance_futures`).
-- Volume is denominated in BTC. Use `GET /exchange_rates` in `references/utils.md` to convert.
-- Granularity is automatic and cannot be adjusted: 1 day → 10-minutely, 7/14 days → hourly, 30 days and above → daily.
-- Cache / Update Frequency: every 60 seconds for all plans.
-
-### Example Response
-```json
-[
-  [1711792200000, "306800.05"],
-  [1711795800000, "302561.82"],
-  [1711799400000, "298240.51"]
-]
-```
-
-### Response Fields
-
-| Field | Description |
-|---|---|
-| `[0]` | UNIX timestamp in milliseconds |
-| `[1]` | Trading volume in BTC (string) |
+- Granularity is automatic: 1 day → 10-minutely, 7/14 days → hourly, 30 days and above → daily.
 
 ---
 
@@ -312,35 +303,15 @@ endpoints in this file also accept derivatives exchange IDs.
 |---|---|
 | Description | Query historical trading volume in BTC for an exchange within a specific date range |
 | Path | `GET /exchanges/{id}/volume_chart/range` |
-| Plan | **Paid only** (Analyst, Lite, Pro, Enterprise) |
 
 ### Parameters
 
 | Parameter | Type | Required | Description |
 |---|---|---|---|
-| `id` | string | Yes (path) | Exchange ID or derivatives exchange ID. Refer to `GET /exchanges/list` above |
+| `id` | string | Yes (path) | Exchange ID or derivatives exchange ID |
 | `from` | number | Yes | Start date as UNIX timestamp |
 | `to` | number | Yes | End date as UNIX timestamp |
 
 ### Notes
-- Also accepts derivatives exchange IDs (e.g. `binance_futures`).
 - Date range between `from` and `to` must be within **31 days**.
-- Data interval is fixed at **daily** — no granularity options.
-- Volume is denominated in BTC. Use `GET /exchange_rates` in `references/utils.md` to convert.
-- Cache / Update Frequency: every 5 minutes.
-
-### Example Response
-```json
-[
-  [1711792200000, "306800.05"],
-  [1711795800000, "302561.82"],
-  [1711799400000, "298240.51"]
-]
-```
-
-### Response Fields
-
-| Field | Description |
-|---|---|
-| `[0]` | UNIX timestamp in milliseconds |
-| `[1]` | Trading volume in BTC (string) |
+- Data interval is fixed at **daily**.
