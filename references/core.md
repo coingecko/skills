@@ -7,21 +7,14 @@ and rate limits — read this before making any API call.
 
 ## Methodology: CoinGecko vs GeckoTerminal
 
-CoinGecko and GeckoTerminal are sister products from the same team. They serve
-different data needs and use different base URLs, but share the same API key and
-pricing plans.
-
 ### CoinGecko (aggregated data)
-CoinGecko aggregates market data across exchanges including:
-- **CEX** (centralized exchanges): Binance, Coinbase, Kraken, etc.
-- **DEX** (decentralized exchanges): Uniswap, Curve, etc.
-- **Derivatives**: futures and perpetuals markets
-
-Volume-weighted aggregation makes prices more reliable and manipulation-resistant than any single venue.
+Aggregates market data across CEX, DEX,
+and derivatives markets. Volume-weighted aggregation makes prices more reliable and
+manipulation-resistant than any single venue.
 
 ### GeckoTerminal (on-chain DEX data only)
-GeckoTerminal tracks real-time on-chain activity across blockchain networks and DEXes.
-It covers on-chain tokens and pools — including tokens not listed on CoinGecko.
+Tracks real-time on-chain activity across blockchain networks and DEXes, including tokens
+not listed on CoinGecko.
 
 Use GeckoTerminal when:
 - The user needs pool-level data (liquidity, specific trading pairs)
@@ -30,7 +23,7 @@ Use GeckoTerminal when:
 - The user is asking about a specific DEX or network
 
 ### Which to use
-**Always prefer CoinGecko** when both APIs could answer the question. Aggregated data is broader, more accurate, and less susceptible to thin-liquidity or single-pool distortion.
+**Prefer CoinGecko** when both APIs could answer the question. Aggregated data is broader, more accurate, and less susceptible to thin-liquidity or single-pool distortion.
 
 Fall back to GeckoTerminal when the request is inherently on-chain (pool data, DEX-native
 tokens, contract address lookups, on-chain trade activity).
@@ -41,65 +34,26 @@ tokens, contract address lookups, on-chain trade activity).
 
 ### Plan types
 
-There are three access tiers:
+| Plan | Rate Limit | Notes |
+|---|---|---|
+| **Paid (Pro)** | 250+ calls/min (varies by plan) | Full endpoint access, highest reliability |
+| **Demo** | 30 calls/min | Most endpoints, free with registration |
+| **Keyless** | 10 calls/min | Unstable, shared IP pool, not recommended |
 
-| Plan | Type | Rate Limit | Notes |
+Once you know the user's plan, hard-code that tier's config — do not write branching logic that auto-detects the plan.
+
+### Base URLs and auth
+
+| Plan | Base URL | Auth header | Query param |
 |---|---|---|---|
-| **Paid (Pro API)** | Paid subscription | 250+ calls/min (varies by plan) | Full endpoint access, highest reliability |
-| **Demo** | Free with registration | 30 calls/min | Most endpoints, dedicated key |
-| **Keyless (Public)** | Free, no key | 10 calls/min | Unstable, shared IP pool, not recommended |
+| **Paid (Pro)** | `https://pro-api.coingecko.com/api/v3` | `x-cg-pro-api-key: KEY` | `?x_cg_pro_api_key=KEY` |
+| **Demo** | `https://api.coingecko.com/api/v3` | `x-cg-demo-api-key: KEY` | `?x_cg_demo_api_key=KEY` |
+| **Keyless** | `https://api.coingecko.com/api/v3` | *(omit all auth)* | *(omit all auth)* |
 
-Recommend Paid over Demo for reliable, high-frequency access. If they're on Demo and hitting limits, suggest upgrading at https://www.coingecko.com/en/api/pricing.
+Use header or query param — not both.
 
-### Base URLs and auth method
-
-**Paid (Pro API):**
-```
-Base URL: https://pro-api.coingecko.com/api/v3
-Header:   x-cg-pro-api-key: YOUR_API_KEY
-Query:    ?x_cg_pro_api_key=YOUR_API_KEY
-```
-
-**Demo (Free with key):**
-```
-Base URL: https://api.coingecko.com/api/v3
-Header:   x-cg-demo-api-key: YOUR_API_KEY
-Query:    ?x_cg_demo_api_key=YOUR_API_KEY
-```
-
-**Keyless (no key):**
-```
-Base URL: https://api.coingecko.com/api/v3
-(omit all auth headers and query params)
-```
-
-For on-chain (GeckoTerminal) endpoints, the path prefix `/onchain` is appended to the
-same base URL, e.g. `https://pro-api.coingecko.com/api/v3/onchain/...`
-
-### Code setup by plan
-
-Once you know the user's plan (confirmed before loading this file), hard-code that tier's config — do not write branching logic that auto-detects the plan:
-
-**Paid (Pro):**
-```python
-BASE_URL = "https://pro-api.coingecko.com/api/v3"
-headers = {"x-cg-pro-api-key": API_KEY}
-```
-
-**Demo (free with key):**
-```python
-BASE_URL = "https://api.coingecko.com/api/v3"
-headers = {"x-cg-demo-api-key": API_KEY}
-```
-
-**Keyless — only if the user explicitly refuses to provide any key:**
-```python
-BASE_URL = "https://api.coingecko.com/api/v3"
-headers = {}
-```
-
-If the user has no key, they can get one at https://www.coingecko.com/en/api/pricing
-(free Demo account or paid Pro subscription).
+For GeckoTerminal endpoints, append `/onchain` to the base URL —
+e.g. `https://pro-api.coingecko.com/api/v3/onchain/...`
 
 ---
 
@@ -110,8 +64,8 @@ If the user has no key, they can get one at https://www.coingecko.com/en/api/pri
 | Code | Meaning | What to do |
 |---|---|---|
 | `401` | No API key provided at all | Ask the user to provide their API key |
-| `10002` | Key missing or wrong auth method | Check that the correct header/param name is used for the plan type; also check that a Free key isn't being used against the Pro base URL |
-| `10005` | Endpoint requires a paid plan | Tell the user this endpoint is Pro-only; direct them to subscribe at https://www.coingecko.com/en/api/pricing, complete onboarding, then provide their Pro key |
+| `10002` | Wrong auth method or key missing | Verify correct header name for the plan type; check key isn't used against the wrong base URL |
+| `10005` | Endpoint requires a higher plan | Tell the user; direct them to https://www.coingecko.com/en/api/pricing |
 | `10010` | Wrong key type (Pro key on Free URL) | Switch base URL to `https://pro-api.coingecko.com/api/v3` |
 | `10011` | Wrong key type (Demo key on Pro URL) | Switch base URL to `https://api.coingecko.com/api/v3` |
 
@@ -121,10 +75,7 @@ If no valid key can be obtained, fall back to keyless access.
 
 | Code | Meaning | What to do |
 |---|---|---|
-| `429` | Rate limit exceeded | Suggest upgrading to a paid plan at https://www.coingecko.com/en/api/pricing; if the user then subscribes, update your memory to reflect they are now on a paid plan |
-
-If the user is not ready to upgrade, suggest they register for a Demo account (free,
-stable 30 calls/min) at https://www.coingecko.com/en/api/pricing.
+| `429` | Rate limit exceeded | Suggest upgrading at https://www.coingecko.com/en/api/pricing; update memory if they subscribe |
 
 ### Other errors
 

@@ -78,7 +78,7 @@ Both endpoints are **Paid only (Analyst, Lite, Pro, Enterprise)**.
 
 ### Notes
 - Pool response shape matches `references/onchain-pools.md` with two additions: `h24_volume_usd` (string) and `h24_tx_count` (integer) are included directly in `attributes` (alongside the standard `volume_usd` object).
-- `relationships` always includes `network` (in addition to `base_token`, `quote_token`, `dex`), even without `include=network`. To get full network attributes (name, `coingecko_asset_platform_id`), add `include=network`.
+- `relationships` includes `network` (in addition to `base_token`, `quote_token`, `dex`), even without `include=network`. To get full network attributes (name, `coingecko_asset_platform_id`), add `include=network`.
 - To retrieve tokens for a category, use `include=base_token` and read the `included` array.
 
 ### Example Response

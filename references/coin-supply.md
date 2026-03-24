@@ -157,7 +157,7 @@ if the target is known, or `GET /coins/list` in `references/coins.md` for the fu
 | `to` | string | Yes | End date as ISO string (`YYYY-MM-DD` or `YYYY-MM-DDTHH:MM`, recommended) or UNIX timestamp |
 
 ### Notes
-- Unlike the circulating supply range endpoint, there is no `interval` param — data is always returned at **daily intervals (00:00 UTC)**.
+- Unlike the circulating supply range endpoint, there is no `interval` param — data is returned at **daily intervals (00:00 UTC)**.
 - Use ISO date strings (`YYYY-MM-DD`) for best compatibility over UNIX timestamps.
 - Data available from 22 June 2019 onwards.
 - The last completed UTC day is available 35 minutes after midnight (00:35 UTC).

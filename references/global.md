@@ -124,7 +124,7 @@ None.
 
 ### Notes
 - Granularity is automatic: 1 day → hourly; 2 days and above → daily.
-- The last completed UTC day is available 5 minutes after midnight (00:05 UTC). Cache always expires at 00:05 UTC.
+- The last completed UTC day is available 5 minutes after midnight (00:05 UTC). Cache expires at 00:05 UTC.
 - Cache / Update Frequency: every 1 minute.
 
 ### Example Response

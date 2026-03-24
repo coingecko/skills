@@ -15,22 +15,36 @@ description: >
 
 You have access to the CoinGecko API (aggregated data) and the GeckoTerminal API
 (on-chain DEX data). Together they cover virtually all crypto market data needs.
+Both APIs share the same API key and plan tier. GeckoTerminal endpoints use the
+same base URL as CoinGecko plus an `/onchain` path prefix (details in `references/core.md`).
 
 ## Before anything else
 
-> **STOP — do not read reference files, write any code, or call any endpoint until you have
-> confirmed both of the following with the user.**
+Credentials must come first — base URL and auth header differ by tier, and both key types
+start with `CG-` so you cannot infer the plan from the key alone.
 
-Ask the user:
-1. **Plan tier** — are they on a paid (Pro) plan or the free (Demo) plan?
-2. **API key** — what is their `CG-…` key?
+**Check memory first.** If the user's plan tier and API key are already saved, confirm they
+are still current. Otherwise ask:
+1. **Plan tier** — paid (Pro) or free (Demo)?
+2. **API key** — their `CG-…` key?
 
-Both key types start with `CG-` so you cannot infer the plan from the key alone. The base
-URL and auth header differ between tiers; using the wrong combination will cause auth errors
-or silently hit the wrong endpoints.
+**No key?** Proceed with keyless access (Demo base URL, no auth header), but warn the user
+it's capped at 10 calls/min and may be unreliable. Suggest a free Demo key at
+https://www.coingecko.com/en/api/pricing for more than a few calls.
 
-Once both are confirmed, read `references/core.md` for the full auth setup and rate-limit
-details before proceeding.
+Then read `references/core.md` for full auth setup and the keyless code pattern, and save
+the confirmed plan tier to memory for future sessions.
+
+## Workflow
+
+Once credentials are confirmed, follow this sequence for every request:
+
+1. **Identify the domain** — use the Reference index below to decide which file(s) to load.
+2. **Check tier gating** — if the endpoint is marked Enterprise or Analyst+, confirm the user
+   is on a qualifying plan before proceeding (see tier flags in the Reference index below).
+3. **Load the relevant reference file(s)** and construct the request.
+4. **Execute and handle errors** — auth and rate-limit error codes are documented in
+   `references/core.md`.
 
 ## Reference index
 
@@ -41,10 +55,10 @@ load the file(s) that match the current request.
 
 | File | When to load |
 |---|---|
-| `references/core.md` | **Always** — auth, methodology, rate limits |
+| `references/core.md` | **Always read** — auth, methodology, rate limits |
 | `references/coins.md` | Coin prices, market data, metadata, tickers, gainers/losers |
 | `references/coin-history.md` | Historical charts, OHLC, time-range queries by coin ID |
-| `references/coin-supply.md` | Circulating/total supply charts |
+| `references/coin-supply.md` | Circulating/total supply charts — **Enterprise only** |
 | `references/contract.md` | Coin data or charts looked up by token contract address |
 | `references/asset-platforms.md` | Blockchain platform IDs, token lists |
 | `references/categories.md` | Coin categories and sector market data |
@@ -61,7 +75,7 @@ load the file(s) that match the current request.
 |---|---|
 | `references/onchain-networks.md` | Supported networks and DEXes (ID resolution) |
 | `references/onchain-pools.md` | Pool discovery, trending/new pools, megafilter |
-| `references/onchain-tokens.md` | Token data, holders, traders, price by contract address |
+| `references/onchain-tokens.md` | Token data, price by contract address (Paid); holders and traders endpoints — **Analyst+** |
 | `references/onchain-ohlcv-trades.md` | OHLCV candles and trade history for pools/tokens |
 | `references/onchain-categories.md` | On-chain pool categories (GeckoTerminal-specific) |
 

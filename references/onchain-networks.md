@@ -65,7 +65,7 @@ required params throughout `references/onchain-pools.md`,
 | Field | Description |
 |---|---|
 | `data[].id` | Network ID — use as `{network}` in all onchain path params |
-| `data[].type` | Always `"network"` |
+| `data[].type` | `"network"` |
 | `data[].attributes.name` | Human-readable network name |
 | `data[].attributes.coingecko_asset_platform_id` | Corresponding CoinGecko asset platform ID (may be `null` if no mapping exists) |
 
@@ -119,5 +119,5 @@ required params throughout `references/onchain-pools.md`,
 | Field | Description |
 |---|---|
 | `data[].id` | DEX ID — use as `{dex}` in pool endpoints |
-| `data[].type` | Always `"dex"` |
+| `data[].type` | `"dex"` |
 | `data[].attributes.name` | Human-readable DEX name |
