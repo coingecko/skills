@@ -8,25 +8,31 @@ and rate limits — read this before making any API call.
 ## Methodology: CoinGecko vs GeckoTerminal
 
 ### CoinGecko (aggregated data)
-Aggregates market data across CEX, DEX,
-and derivatives markets. Volume-weighted aggregation makes prices more reliable and
-manipulation-resistant than any single venue.
+Covers tens of thousands of coins, each reviewed by the CoinGecko team before listing.
+Aggregates market data across CEX, DEX, and derivatives markets — volume-weighted
+aggregation makes prices more reliable and manipulation-resistant than any single venue.
+Best suited for well-known assets (Bitcoin, Ethereum, Solana, major memecoins, etc.) and
+broad market overviews like top coins by market cap, category rankings, and global stats.
 
 ### GeckoTerminal (on-chain DEX data only)
-Tracks real-time on-chain activity across blockchain networks and DEXes, including tokens
-not listed on CoinGecko.
+Covers tens of millions of tokens and pools, listed automatically from on-chain activity
+— no review gate. Includes the full long tail: newly launched tokens, micro-cap coins,
+and pools that don't meet CoinGecko's listing criteria. Tracks real-time on-chain
+activity across blockchain networks and DEXes.
 
 Use GeckoTerminal when:
 - The user needs pool-level data (liquidity, specific trading pairs)
-- The token only exists on-chain and isn't listed on CoinGecko
+- The token is long-tail or newly launched and isn't listed on CoinGecko
 - The user needs on-chain trade history or OHLCV
 - The user is asking about a specific DEX or network
 
 ### Which to use
-**Prefer CoinGecko** when both APIs could answer the question. Aggregated data is broader, more accurate, and less susceptible to thin-liquidity or single-pool distortion.
+**Prefer CoinGecko** when both APIs could answer the question — aggregated data is
+broader, more accurate, and less susceptible to thin-liquidity or single-pool distortion.
 
 Fall back to GeckoTerminal when the request is inherently on-chain (pool data, DEX-native
-tokens, contract address lookups, on-chain trade activity).
+tokens, contract address lookups, on-chain trade activity) or targets tokens not listed
+on CoinGecko.
 
 ---
 
