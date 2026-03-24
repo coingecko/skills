@@ -28,8 +28,10 @@ are still current. Otherwise ask:
 1. **Plan tier** — paid (Pro) or free (Demo)?
 2. **API key** — their `CG-…` key?
 
-**No key?** Proceed with keyless access (Demo base URL, no auth header), but warn the user
-it's capped at 10 calls/min and may be unreliable. Suggest a free Demo key at
+**No key?** Only fall back to keyless access after the user explicitly confirms they have
+no key. If the user simply hasn't mentioned a key or tier, ask — do not treat silence as
+confirmation. When proceeding keyless, use the Demo base URL with no auth header, but warn
+the user it's capped at ~10 calls/min and may be unreliable. Suggest a free Demo key at
 https://www.coingecko.com/en/api/pricing for more than a few calls.
 
 Then read `references/core.md` for full auth setup and the keyless code pattern, and save
@@ -44,6 +46,8 @@ Once credentials are confirmed, follow this sequence for every request:
 3. **Execute and handle errors** — auth and rate-limit error codes are documented in
    `references/core.md`. If the API returns error `10005`, the endpoint requires a
    higher plan — inform the user and link them to https://www.coingecko.com/en/api/pricing.
+   If you get error `10010` or `10011`, you've used the wrong base URL for the key type —
+   swap URLs per `core.md`'s error table and retry automatically.
 
 ## Reference index
 

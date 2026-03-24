@@ -174,7 +174,7 @@ Both OHLC endpoints return the same response format: an array of 5-element array
 | `id` | string | Yes (path) | CoinGecko coin ID |
 | `vs_currency` | string | Yes | Target currency. Refer to `references/utils.md` → `GET /simple/supported_vs_currencies` |
 | `days` | string | Yes | Number of days ago: `1`, `7`, `14`, `30`, `90`, `180`, `365`, or `max` |
-| `interval` | string | No | Candle interval: `daily` or `hourly` (paid plans). Leave empty for auto granularity |
+| `interval` | string | No | Candle interval: `daily` or `hourly`. Leave empty for auto granularity |
 | `precision` | string | No | Decimal places: `full` or `0`–`18` |
 
 ### Notes

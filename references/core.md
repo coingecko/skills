@@ -76,8 +76,10 @@ date range:
 - 2–90 days → hourly
 - Above 90 days → daily (00:00 UTC)
 
-Setting `interval` explicitly to `5m` or `hourly` bypasses auto-granularity (check
-the specific endpoint for supported values).
+You may bypass auto-granularity by setting `interval` explicitly:
+- `interval=daily` — daily historical data.
+- `interval=hourly` — hourly historical data, up to the **past 100 days**.
+- `interval=5m` — 5-minutely historical data, up to the **past 10 days** (or up to **any 10-day** date range per request). Exclusive to Enterprise subscribers.
 
 ### Data availability
 The last completed UTC day is typically available 10–35 minutes after midnight UTC,
