@@ -11,18 +11,18 @@ Requires network IDs — load `references/onchain-networks.md` first if unknown.
 
 ## Endpoint Overview
 
-| Summary | Path | Plan |
-|---|---|---|
-| Token Price by Token Addresses | `GET /onchain/simple/networks/{network}/token_price/{addresses}` | Paid |
-| Token Data by Token Address | `GET /onchain/networks/{network}/tokens/{address}` | Paid |
-| Tokens Data by Token Addresses | `GET /onchain/networks/{network}/tokens/multi/{addresses}` | Paid |
-| Token Info by Token Address | `GET /onchain/networks/{network}/tokens/{address}/info` | Paid |
-| Pool Tokens Info by Pool Address | `GET /onchain/networks/{network}/pools/{pool_address}/info` | Paid |
-| Top Pools by Token Address | `GET /onchain/networks/{network}/tokens/{token_address}/pools` | Paid |
-| Most Recently Updated Tokens List | `GET /onchain/tokens/info_recently_updated` | Paid |
-| Top Token Holders by Token Address | `GET /onchain/networks/{network}/tokens/{address}/top_holders` | Analyst, Lite, Pro, Enterprise |
-| Historical Token Holders Chart | `GET /onchain/networks/{network}/tokens/{token_address}/holders_chart` | Analyst, Lite, Pro, Enterprise |
-| Top Token Traders by Token Address | `GET /onchain/networks/{network_id}/tokens/{token_address}/top_traders` | Analyst, Lite, Pro, Enterprise |
+| Summary | Path |
+|---|---|
+| Token Price by Token Addresses | `GET /onchain/simple/networks/{network}/token_price/{addresses}` |
+| Token Data by Token Address | `GET /onchain/networks/{network}/tokens/{address}` |
+| Tokens Data by Token Addresses | `GET /onchain/networks/{network}/tokens/multi/{addresses}` |
+| Token Info by Token Address | `GET /onchain/networks/{network}/tokens/{address}/info` |
+| Pool Tokens Info by Pool Address | `GET /onchain/networks/{network}/pools/{pool_address}/info` |
+| Top Pools by Token Address | `GET /onchain/networks/{network}/tokens/{token_address}/pools` |
+| Most Recently Updated Tokens List | `GET /onchain/tokens/info_recently_updated` |
+| Top Token Holders by Token Address | `GET /onchain/networks/{network}/tokens/{address}/top_holders` |
+| Historical Token Holders Chart | `GET /onchain/networks/{network}/tokens/{token_address}/holders_chart` |
+| Top Token Traders by Token Address | `GET /onchain/networks/{network_id}/tokens/{token_address}/top_traders` |
 
 ---
 
@@ -74,14 +74,13 @@ and are not vetted by CoinGecko. For reviewed metadata, use
 |---|---|
 | Description | Token prices for up to 100 contract addresses |
 | Path | `GET /onchain/simple/networks/{network}/token_price/{addresses}` |
-| Plan | Paid |
 
 ### Parameters
 
 | Parameter | Type | Required | Description |
 |---|---|---|---|
 | `network` | string | Yes | Network ID |
-| `addresses` | string | Yes | Token contract address(es), comma-separated. Max 100 (Analyst+ only above 1) |
+| `addresses` | string | Yes | Token contract address(es), comma-separated. Max 100 |
 | `include_market_cap` | boolean | No | Include `market_cap_usd` per token. Default: `false` |
 | `mcap_fdv_fallback` | boolean | No | Return FDV when market cap is unavailable. Default: `false` |
 | `include_24hr_vol` | boolean | No | Include `h24_volume_usd`. Default: `false` |
@@ -90,7 +89,6 @@ and are not vetted by CoinGecko. For reviewed metadata, use
 | `include_inactive_source` | boolean | No | When no active pool found, expand to recently active pools (up to 1 year). Default: `false` |
 
 ### Notes
-- Real-time (cacheless) for all paid plans.
 - Price is sourced from GeckoTerminal's routing (best pool by liquidity/activity). For a fixed price source, use `references/onchain-pools.md` → `GET /onchain/networks/{network}/pools/{address}`.
 - Unrecognised addresses are silently ignored.
 
@@ -145,7 +143,6 @@ All attribute maps are keyed by token contract address.
 |---|---|
 | Description | Single token market data with optional top pool sideload |
 | Path | `GET /onchain/networks/{network}/tokens/{address}` |
-| Plan | Paid |
 
 ### Parameters
 
@@ -196,21 +193,19 @@ All attribute maps are keyed by token contract address.
 |---|---|
 | Description | Batch token market data for up to 50 addresses |
 | Path | `GET /onchain/networks/{network}/tokens/multi/{addresses}` |
-| Plan | Paid |
 
 ### Parameters
 
 | Parameter | Type | Required | Description |
 |---|---|---|---|
 | `network` | string | Yes | Network ID |
-| `addresses` | string | Yes | Comma-separated token contract addresses (max 50, Analyst+) |
+| `addresses` | string | Yes | Comma-separated token contract addresses (max 50) |
 | `include` | string | No | `top_pools` |
 | `include_composition` | boolean | No | Default: `false` |
 | `include_inactive_source` | boolean | No | Default: `false` |
 
 ### Notes
 - Response `data` is an array; all other fields identical to the single token endpoint above.
-- Exceeding 1 address requires Analyst plan or above (max 50).
 
 ---
 
@@ -220,7 +215,6 @@ All attribute maps are keyed by token contract address.
 |---|---|
 | Description | Token metadata: name, symbol, image, socials, description, GT Score, holder distribution |
 | Path | `GET /onchain/networks/{network}/tokens/{address}/info` |
-| Plan | Paid |
 
 ### Parameters
 
@@ -240,7 +234,6 @@ All attribute maps are keyed by token contract address.
 |---|---|
 | Description | Token Info objects for both base and quote tokens of a pool |
 | Path | `GET /onchain/networks/{network}/pools/{pool_address}/info` |
-| Plan | Paid |
 
 ### Parameters
 
@@ -253,10 +246,7 @@ All attribute maps are keyed by token contract address.
 ### Notes
 - For pool market data (price, volume, transactions), use `references/onchain-pools.md` → `GET /onchain/networks/{network}/pools/{address}` instead.
 - `holders` data is Beta; supported chains: Solana, EVM (Ethereum, Polygon, BNB, Arbitrum, Optimism, Base), Sui, TON, Ronin.
-
-### Response Fields
-- Response `data` is an array of two token objects (base and quote token).
-- Each object follows the [Shared Token Info Shape](#shared-token-info-shape).
+- Response `data` is an array of two token objects (base and quote token), each following the [Shared Token Info Shape](#shared-token-info-shape).
 
 ---
 
@@ -266,7 +256,6 @@ All attribute maps are keyed by token contract address.
 |---|---|
 | Description | Pools for a given token, ranked by combined liquidity and 24hr volume |
 | Path | `GET /onchain/networks/{network}/tokens/{token_address}/pools` |
-| Plan | Paid |
 
 ### Parameters
 
@@ -275,17 +264,14 @@ All attribute maps are keyed by token contract address.
 | `network` | string | Yes | Network ID |
 | `token_address` | string | Yes | Token contract address |
 | `include` | string | No | `base_token`, `quote_token`, `dex` (comma-separated) |
-| `page` | integer | No | Default: `1`. Beyond page 10 requires Analyst+ |
+| `page` | integer | No | Default: `1` |
 | `sort` | string | No | `h24_volume_usd_liquidity_desc` (default), `h24_tx_count_desc`, `h24_volume_usd_desc` |
 | `include_gt_community_data` | boolean | No | Default: `false` |
 | `include_inactive_source` | boolean | No | Expand to recently active pools. Default: `false` |
 
 ### Notes
 - Max 20 pools per page.
-
-### Response Fields
-- Pool objects follow the shared pool shape from `references/onchain-pools.md`.
-- Each pool additionally includes `last_trade_timestamp` (integer, UNIX seconds).
+- Pool objects follow the shared pool shape from `references/onchain-pools.md`, with an additional `last_trade_timestamp` field.
 
 ---
 
@@ -295,7 +281,6 @@ All attribute maps are keyed by token contract address.
 |---|---|
 | Description | Up to 100 tokens ordered by most recent metadata update |
 | Path | `GET /onchain/tokens/info_recently_updated` |
-| Plan | Paid |
 
 ### Parameters
 
@@ -330,7 +315,6 @@ All attribute maps are keyed by token contract address.
 |---|---|
 | Description | Top holders by token balance for a given token address |
 | Path | `GET /onchain/networks/{network}/tokens/{address}/top_holders` |
-| Plan | Analyst, Lite, Pro, Enterprise |
 
 ### Parameters
 
@@ -400,7 +384,6 @@ All attribute maps are keyed by token contract address.
 |---|---|
 | Description | Time-series holder count snapshots for a token |
 | Path | `GET /onchain/networks/{network}/tokens/{token_address}/holders_chart` |
-| Plan | Analyst, Lite, Pro, Enterprise |
 
 ### Parameters
 
@@ -413,7 +396,7 @@ All attribute maps are keyed by token contract address.
 ### Notes
 - Beta — data quality and coverage are still improving.
 - Supported chains: same as Top Token Holders above.
-- Granularity by `days`: `7` → all data points (no fixed interval); `30` → daily (30 intervals); `max` → weekly.
+- Granularity by `days`: `7` → all data points; `30` → daily; `max` → weekly.
 
 ### Example Response
 ```json
@@ -457,7 +440,6 @@ All attribute maps are keyed by token contract address.
 |---|---|
 | Description | Top traders by PnL or volume for a given token |
 | Path | `GET /onchain/networks/{network_id}/tokens/{token_address}/top_traders` |
-| Plan | Analyst, Lite, Pro, Enterprise |
 
 ### Parameters
 

@@ -19,7 +19,6 @@ contract address endpoints do not support them.
 |---|---|
 | Description | Query all supported NFT collections with ID, contract address, asset platform, name, and symbol |
 | Path | `GET /nfts/list` |
-| Plan | Free + Paid |
 
 ### Parameters
 
@@ -28,10 +27,6 @@ contract address endpoints do not support them.
 | `order` | string | No | Sort order. Options: `h24_volume_usd_asc/desc`, `h24_volume_native_asc/desc`, `floor_price_native_asc/desc`, `market_cap_native_asc/desc`, `market_cap_usd_asc/desc` |
 | `per_page` | number | No | Results per page. Max: `250` |
 | `page` | number | No | Page number |
-
-### Notes
-- Paginated at 100 items by default.
-- Cache / Update Frequency: every 5 minutes for all plans.
 
 ### Example Response
 ```json
@@ -42,13 +37,6 @@ contract address endpoints do not support them.
     "name": "Bored Ape Yacht Club",
     "asset_platform_id": "ethereum",
     "symbol": "BAYC"
-  },
-  {
-    "id": "pudgy-penguins",
-    "contract_address": "0xBd3531dA5CF5857e7CfAA92426877b022e612cf8",
-    "name": "Pudgy Penguins",
-    "asset_platform_id": "ethereum",
-    "symbol": "PPG"
   }
 ]
 ```
@@ -71,7 +59,6 @@ contract address endpoints do not support them.
 |---|---|
 | Description | Query full NFT collection data including floor price, market cap, volume, and stats |
 | Path | `GET /nfts/{id}` |
-| Plan | Free + Paid |
 
 ### Parameters
 
@@ -81,7 +68,6 @@ contract address endpoints do not support them.
 
 ### Notes
 - Supports all collections including Solana NFTs and Art Blocks.
-- Cache / Update Frequency: every 60 seconds for all plans.
 
 ### Example Response
 ```json
@@ -148,7 +134,6 @@ contract address endpoints do not support them.
 |---|---|
 | Description | Query full NFT collection data using asset platform and contract address |
 | Path | `GET /nfts/{asset_platform_id}/contract/{contract_address}` |
-| Plan | Free + Paid |
 
 ### Parameters
 
@@ -160,7 +145,6 @@ contract address endpoints do not support them.
 ### Notes
 - Does **not** support Solana NFTs or Art Blocks — use `GET /nfts/{id}` instead.
 - Response schema is identical to `GET /nfts/{id}`. See response fields there.
-- Cache / Update Frequency: every 60 seconds for all plans.
 
 ---
 
@@ -170,7 +154,6 @@ contract address endpoints do not support them.
 |---|---|
 | Description | Query all NFT collections with current market data, sortable and paginated |
 | Path | `GET /nfts/markets` |
-| Plan | **Paid only** (Analyst, Lite, Pro, Enterprise) |
 
 ### Parameters
 
@@ -180,30 +163,6 @@ contract address endpoints do not support them.
 | `order` | string | No | Sort order. Default: `market_cap_usd_desc`. Options: `h24_volume_native_asc/desc`, `h24_volume_usd_asc/desc`, `market_cap_usd_asc/desc` |
 | `per_page` | number | No | Results per page. Default: `100`. Max: `250` |
 | `page` | number | No | Page number. Default: `1` |
-
-### Notes
-- Collections with low liquidity may not have a market cap rank. Market cap sorting prioritises liquid collections first, then illiquid collections by volume.
-- Cache / Update Frequency: every 5 minutes.
-
-### Example Response
-```json
-[
-  {
-    "id": "pudgy-penguins",
-    "contract_address": "0xBd3531dA5CF5857e7CfAA92426877b022e612cf8",
-    "asset_platform_id": "ethereum",
-    "name": "Pudgy Penguins",
-    "symbol": "PPG",
-    "native_currency_symbol": "ETH",
-    "market_cap_rank": 3,
-    "floor_price": { "native_currency": 12.17, "usd": 44360 },
-    "market_cap": { "native_currency": 108211, "usd": 394267328 },
-    "volume_24h": { "native_currency": 402.37, "usd": 1466028 },
-    "total_supply": 8888,
-    "one_day_sales": 33
-  }
-]
-```
 
 ### Response Fields
 
@@ -217,16 +176,12 @@ Same fields as `GET /nfts/{id}`, excluding `links`, `explorers`, `ath`, `ath_cha
 |---|---|
 | Description | Query per-marketplace floor price and 24hr volume for an NFT collection |
 | Path | `GET /nfts/{id}/tickers` |
-| Plan | **Paid only** (Analyst, Lite, Pro, Enterprise) |
 
 ### Parameters
 
 | Parameter | Type | Required | Description |
 |---|---|---|---|
 | `id` | string | Yes (path) | NFT collection ID. Refer to `GET /nfts/list` above |
-
-### Notes
-- Cache / Update Frequency: every 30 seconds.
 
 ### Example Response
 ```json
@@ -263,40 +218,12 @@ Same fields as `GET /nfts/{id}`, excluding `links`, `explorers`, `ath`, `ath_cha
 
 ---
 
-## `GET /nfts/{id}/market_chart` — NFTs Collection Historical Chart Data by ID
+## NFT Historical Chart Endpoints
 
-| Field | Value |
-|---|---|
-| Description | Query historical floor price, market cap, and 24hr volume time-series for an NFT collection |
-| Path | `GET /nfts/{id}/market_chart` |
-| Plan | **Paid only** (Analyst, Lite, Pro, Enterprise) |
+Both chart endpoints return the same response shape. Granularity is automatic:
+1–14 days → 5-minutely; 15 days and above → daily (00:00 UTC).
 
-### Parameters
-
-| Parameter | Type | Required | Description |
-|---|---|---|---|
-| `id` | string | Yes (path) | NFT collection ID. Refer to `GET /nfts/list` above |
-| `days` | string | Yes | Number of days ago — any integer or `max` |
-
-### Notes
-- Supports all collections including Solana NFTs and Art Blocks.
-- Granularity is automatic: 1–14 days → 5-minutely; 15 days and above → daily (00:00 UTC).
-- The last completed UTC day is available 5 minutes after midnight (00:05 UTC).
-- Cache / Update Frequency: every 5 minutes.
-
-### Example Response
-```json
-{
-  "floor_price_usd": [[1626912000000, 90.17], [1626998400000, 97.32]],
-  "floor_price_native": [[1626912000000, 0.045], [1626998400000, 0.048]],
-  "h24_volume_usd": [[1626912000000, 2860.12], [1626998400000, 2143.51]],
-  "h24_volume_native": [[1626912000000, 1.4274], [1626998400000, 1.0572]],
-  "market_cap_usd": [[1626912000000, 33281860.87], [1626998400000, 38474832.81]],
-  "market_cap_native": [[1626912000000, 11012.23], [1626998400000, 12709.84]]
-}
-```
-
-### Response Fields
+### Chart Response Fields
 
 | Field | Description |
 |---|---|
@@ -309,13 +236,31 @@ Same fields as `GET /nfts/{id}`, excluding `links`, `explorers`, `ath`, `ath_cha
 
 ---
 
+## `GET /nfts/{id}/market_chart` — NFTs Collection Historical Chart Data by ID
+
+| Field | Value |
+|---|---|
+| Description | Query historical floor price, market cap, and 24hr volume time-series for an NFT collection |
+| Path | `GET /nfts/{id}/market_chart` |
+
+### Parameters
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `id` | string | Yes (path) | NFT collection ID. Refer to `GET /nfts/list` above |
+| `days` | string | Yes | Number of days ago — any integer or `max` |
+
+### Notes
+- Supports all collections including Solana NFTs and Art Blocks.
+
+---
+
 ## `GET /nfts/{asset_platform_id}/contract/{contract_address}/market_chart` — NFTs Collection Historical Chart Data by Contract Address
 
 | Field | Value |
 |---|---|
 | Description | Query historical floor price, market cap, and 24hr volume time-series using asset platform and contract address |
 | Path | `GET /nfts/{asset_platform_id}/contract/{contract_address}/market_chart` |
-| Plan | **Paid only** (Analyst, Lite, Pro, Enterprise) |
 
 ### Parameters
 
@@ -327,7 +272,3 @@ Same fields as `GET /nfts/{id}`, excluding `links`, `explorers`, `ath`, `ath_cha
 
 ### Notes
 - Does **not** support Solana NFTs or Art Blocks — use `GET /nfts/{id}/market_chart` instead.
-- Granularity is automatic: 1–14 days → 5-minutely; 15 days and above → daily (00:00 UTC).
-- The last completed UTC day is available 5 minutes after midnight (00:05 UTC).
-- Cache / Update Frequency: every 5 minutes.
-- Response schema is identical to `GET /nfts/{id}/market_chart`. See response fields there.

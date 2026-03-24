@@ -6,11 +6,9 @@ exchanges, open interest, funding rates, or derivatives tickers.
 
 Derivatives exchange IDs (e.g. `binance_futures`, `bybit`) are best resolved via
 `GET /derivatives/exchanges/list` in this file — it returns only derivatives exchanges.
-`GET /exchanges/list` in `references/exchanges.md` also includes derivatives exchange IDs
-(alongside spot exchanges) and can be used interchangeably for volume chart endpoints.
+`GET /exchanges/list` in `references/exchanges.md` also includes derivatives exchange IDs.
 
-To convert BTC-denominated volume to other currencies, use `references/utils.md` →
-`GET /exchange_rates`.
+For BTC-denominated volume conversion, see `references/core.md` → BTC-denominated values.
 
 ---
 
@@ -20,7 +18,6 @@ To convert BTC-denominated volume to other currencies, use `references/utils.md`
 |---|---|
 | Description | Query all derivative tickers across all derivatives exchanges |
 | Path | `GET /derivatives` |
-| Plan | Free + Paid |
 
 ### Parameters
 
@@ -28,7 +25,6 @@ None.
 
 ### Notes
 - `open_interest` and `volume_24h` are denominated in USD.
-- Cache / Update Frequency: every 30 seconds for all plans.
 
 ### Example Response
 ```json
@@ -79,15 +75,10 @@ None.
 |---|---|
 | Description | Query all derivatives exchange IDs and names |
 | Path | `GET /derivatives/exchanges/list` |
-| Plan | Free + Paid |
 
 ### Parameters
 
 None.
-
-### Notes
-- Use `id` values from this endpoint in `GET /derivatives/exchanges/{id}` below.
-- Cache / Update Frequency: every 5 minutes for all plans.
 
 ### Example Response
 ```json
@@ -112,7 +103,6 @@ None.
 |---|---|
 | Description | Query all derivatives exchanges with metadata and market stats |
 | Path | `GET /derivatives/exchanges` |
-| Plan | Free + Paid |
 
 ### Parameters
 
@@ -121,9 +111,6 @@ None.
 | `order` | string | No | Sort order. Default: `open_interest_btc_desc`. Options: `name_asc`, `name_desc`, `open_interest_btc_asc`, `open_interest_btc_desc`, `trade_volume_24h_btc_asc`, `trade_volume_24h_btc_desc` |
 | `per_page` | number | No | Results per page |
 | `page` | number | No | Page number. Default: `1` |
-
-### Notes
-- Cache / Update Frequency: every 60 seconds for all plans.
 
 ### Example Response
 ```json
@@ -168,7 +155,6 @@ None.
 |---|---|
 | Description | Query a single derivatives exchange's metadata, market stats, and optionally its tickers |
 | Path | `GET /derivatives/exchanges/{id}` |
-| Plan | Free + Paid |
 
 ### Parameters
 
@@ -176,9 +162,6 @@ None.
 |---|---|---|---|
 | `id` | string | Yes (path) | Derivatives exchange ID. Refer to `GET /derivatives/exchanges/list` above |
 | `include_tickers` | string | No | Include tickers in response. Options: `all` (all tickers), `unexpired` (active tickers only). Omit to exclude tickers |
-
-### Notes
-- Cache / Update Frequency: every 30 seconds for all plans.
 
 ### Example Response
 ```json

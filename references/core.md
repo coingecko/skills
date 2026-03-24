@@ -57,6 +57,38 @@ e.g. `https://pro-api.coingecko.com/api/v3/onchain/...`
 
 ---
 
+## Common conventions
+
+These patterns recur across many endpoints and are documented here once to avoid repetition.
+
+### Coin ID resolution
+Use `GET /search` (in `references/utils.md`) when you know the coin name or symbol, or
+`GET /coins/list` (in `references/coins.md`) for the full ID map.
+
+### Date parameters
+Use ISO date strings (`YYYY-MM-DD` or `YYYY-MM-DDTHH:MM`) for best compatibility over
+UNIX timestamps in all endpoints that accept `from`/`to` params.
+
+### Auto-granularity for chart endpoints
+When an `interval` param is left empty, granularity is determined automatically by the
+date range:
+- 1 day → 5-minutely
+- 2–90 days → hourly
+- Above 90 days → daily (00:00 UTC)
+
+Setting `interval` explicitly to `5m` or `hourly` bypasses auto-granularity (check
+the specific endpoint for supported values).
+
+### Data availability
+The last completed UTC day is typically available 10–35 minutes after midnight UTC,
+depending on the endpoint.
+
+### BTC-denominated values
+Exchange and derivatives volume endpoints return values in BTC. Use `GET /exchange_rates`
+(in `references/utils.md`) to convert to other currencies.
+
+---
+
 ## Error handling
 
 ### Auth-related errors

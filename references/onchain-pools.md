@@ -84,16 +84,15 @@ endpoints are called out in per-endpoint notes.
 | `transactions` | object | Buy/sell counts keyed by interval: `m5`, `m15`, `m30`, `h1`, `h6`, `h24`. Each: `buys`, `sells`, `buyers`, `sellers` (integers) |
 | `volume_usd` | object | Volume in USD keyed by interval: `m5`, `m15`, `m30`, `h1`, `h6`, `h24` (strings) |
 
-**Extended attributes** (only on `GET /networks/{network}/pools/{address}` and
-`GET /networks/{network}/pools/multi/{addresses}` — the "detailed" endpoints):
+**Extended attributes** (only on single-pool and multi-pool lookup endpoints):
 
 | Field | Type | Description |
 |---|---|---|
-| `pool_name` | string | Pool name without fee tier (e.g. `WETH / USDC`) |
+| `pool_name` | string | Pool name without fee tier |
 | `pool_fee_percentage` | string | Pool fee tier (e.g. `"0.05"`) |
-| `base_token_balance` | string | Base token balance in pool (requires `include_composition=true`) |
+| `base_token_balance` | string | Base token balance (requires `include_composition=true`) |
 | `base_token_liquidity_usd` | string | Base token liquidity in USD (requires `include_composition=true`) |
-| `quote_token_balance` | string | Quote token balance in pool (requires `include_composition=true`) |
+| `quote_token_balance` | string | Quote token balance (requires `include_composition=true`) |
 | `quote_token_liquidity_usd` | string | Quote token liquidity in USD (requires `include_composition=true`) |
 | `net_buy_volume_usd` | object | Net buy volume by interval (requires `include_volume_breakdown=true`) |
 | `buy_volume_usd` | object | Buy-side volume by interval (requires `include_volume_breakdown=true`) |
@@ -122,10 +121,9 @@ Populated when `include` param is used. Each item has `id`, `type`, and `attribu
 
 - `data[].id` format: `{network_id}_{pool_address}` (e.g. `eth_0x88e6a...`)
 - `market_cap_usd` is `null` when not verified; the displayed value on GeckoTerminal may match FDV and not be accurate.
-- `include` param values are comma-separated: `base_token`, `quote_token`, `dex`, `network` (availability varies by endpoint — see per-endpoint notes).
+- `include` param values are comma-separated: `base_token`, `quote_token`, `dex`, `network` (availability varies by endpoint).
 - Included attributes appear under the top-level `"included"` key, not nested in `data`.
-- Max 20 pools per page. `page` beyond 10 requires Analyst plan or above.
-- Cache / Update Frequency: every 30 seconds (unless otherwise noted).
+- Max 20 pools per page.
 
 ---
 
@@ -133,34 +131,22 @@ Populated when `include` param is used. Each item has `id`, `type`, and `attribu
 
 ### `GET /onchain/networks/{network}/pools/{address}` — Specific Pool by Address
 
-| Field | Value |
-|---|---|
-| Plan | Paid only (Analyst, Lite, Pro, Enterprise) |
-| Cache | Every 10 seconds |
-
 Returns a single pool object (`data` is an object, not array). Includes extended
-attributes (`pool_name`, `pool_fee_percentage`, volume breakdown, composition,
-`locked_liquidity_percentage`). Supports `launchpad_details` for bonding curve pools.
+attributes. Supports `launchpad_details` for bonding curve pools.
 
 | Parameter | Type | Required | Description |
 |---|---|---|---|
 | `network` | string | Yes | Network ID |
 | `address` | string | Yes | Pool contract address |
 | `include` | string | No | `base_token`, `quote_token`, `dex` (comma-separated) |
-| `include_volume_breakdown` | boolean | No | Include `buy_volume_usd`, `sell_volume_usd`, `net_buy_volume_usd`. Default: `false` |
-| `include_composition` | boolean | No | Include token balances and liquidity values. Default: `false` |
+| `include_volume_breakdown` | boolean | No | Default: `false` |
+| `include_composition` | boolean | No | Default: `false` |
 
 ---
 
 ### `GET /onchain/networks/{network}/pools/multi/{addresses}` — Multiple Pools by Address
 
-| Field | Value |
-|---|---|
-| Plan | Paid only (Analyst, Lite, Pro, Enterprise) |
-| Cache | Every 10 seconds |
-
-Batch lookup. Same extended attributes as single pool endpoint. Up to 50 addresses
-per request (Analyst plan or above).
+Batch lookup. Same extended attributes as single pool endpoint. Up to 50 addresses.
 
 | Parameter | Type | Required | Description |
 |---|---|---|---|
@@ -174,10 +160,6 @@ per request (Analyst plan or above).
 
 ### `GET /onchain/networks/trending_pools` — Trending Pools (All Networks)
 
-| Field | Value |
-|---|---|
-| Plan | Free + Paid |
-
 | Parameter | Type | Required | Description |
 |---|---|---|---|
 | `include` | string | No | `base_token`, `quote_token`, `dex`, `network` (comma-separated) |
@@ -190,10 +172,6 @@ Trending rank is based on user engagement, trading activity, and pool security/l
 ---
 
 ### `GET /onchain/networks/{network}/trending_pools` — Trending Pools by Network
-
-| Field | Value |
-|---|---|
-| Plan | Free + Paid |
 
 Same as above but scoped to one network.
 
@@ -209,10 +187,6 @@ Same as above but scoped to one network.
 
 ### `GET /onchain/networks/{network}/pools` — Top Pools by Network
 
-| Field | Value |
-|---|---|
-| Plan | Free + Paid |
-
 | Parameter | Type | Required | Description |
 |---|---|---|---|
 | `network` | string | Yes | Network ID |
@@ -227,10 +201,6 @@ For more control over filtering, use `GET /onchain/pools/megafilter` instead.
 
 ### `GET /onchain/networks/{network}/dexes/{dex}/pools` — Top Pools by DEX
 
-| Field | Value |
-|---|---|
-| Plan | Free + Paid |
-
 | Parameter | Type | Required | Description |
 |---|---|---|---|
 | `network` | string | Yes | Network ID |
@@ -244,10 +214,6 @@ For more control over filtering, use `GET /onchain/pools/megafilter` instead.
 
 ### `GET /onchain/networks/new_pools` — New Pools (All Networks)
 
-| Field | Value |
-|---|---|
-| Plan | Free + Paid |
-
 | Parameter | Type | Required | Description |
 |---|---|---|---|
 | `include` | string | No | `base_token`, `quote_token`, `dex`, `network` (comma-separated) |
@@ -257,10 +223,6 @@ For more control over filtering, use `GET /onchain/pools/megafilter` instead.
 ---
 
 ### `GET /onchain/networks/{network}/new_pools` — New Pools by Network
-
-| Field | Value |
-|---|---|
-| Plan | Free + Paid |
 
 Returns newly created pools in the past 48 hours on the specified network.
 
@@ -274,10 +236,6 @@ Returns newly created pools in the past 48 hours on the specified network.
 ---
 
 ### `GET /onchain/pools/megafilter` — Megafilter for Pools
-
-| Field | Value |
-|---|---|
-| Plan | **Paid only** (Analyst, Lite, Pro, Enterprise) |
 
 Full-featured pool filter across all networks. Use this when the simpler top/trending
 endpoints lack the required precision.
@@ -328,11 +286,6 @@ endpoints lack the required precision.
 
 ### `GET /onchain/pools/trending_search` — Trending Search Pools
 
-| Field | Value |
-|---|---|
-| Plan | **Paid only** (Analyst, Lite, Pro, Enterprise) |
-| Cache | Every 60 seconds |
-
 Returns the top trending search pools across all networks. Response attributes are a
 **subset** of the standard pool shape: only `trending_rank`, `address`, `name`,
 `pool_created_at`, `fdv_usd`, `market_cap_usd`, `volume_usd.h24`, and
@@ -348,10 +301,6 @@ Returns the top trending search pools across all networks. Response attributes a
 ---
 
 ### `GET /onchain/search/pools` — Search Pools & Tokens
-
-| Field | Value |
-|---|---|
-| Plan | Free + Paid |
 
 Search by pool contract address, token name, token symbol, or token contract address.
 Returns the standard pool shape (without extended attributes).

@@ -17,7 +17,6 @@ Asset platform IDs can be resolved via `references/asset-platforms.md` →
 |---|---|
 | Description | Query current price(s) for one or more tokens by contract address |
 | Path | `GET /simple/token_price/{id}` |
-| Plan | Free + Paid |
 
 ### Parameters
 
@@ -34,7 +33,6 @@ Asset platform IDs can be resolved via `references/asset-platforms.md` →
 
 ### Notes
 - Returns the global average price aggregated across all active exchanges on CoinGecko.
-- Cache / Update Frequency: every 20 seconds (Analyst, Lite, Pro, Enterprise).
 
 ### Example Response
 ```json
@@ -55,8 +53,8 @@ Asset platform IDs can be resolved via `references/asset-platforms.md` →
 |---|---|
 | `{contract_address}` | Top-level key is the queried contract address |
 | `{vs_currency}` | Price in the requested currency |
-| `{vs_currency}_market_cap` | Market cap in the requested currency. Present when `include_market_cap=true` |
-| `{vs_currency}_24h_vol` | 24hr volume in the requested currency. Present when `include_24hr_vol=true` |
+| `{vs_currency}_market_cap` | Market cap. Present when `include_market_cap=true` |
+| `{vs_currency}_24h_vol` | 24hr volume. Present when `include_24hr_vol=true` |
 | `{vs_currency}_24h_change` | 24hr price change %. Present when `include_24hr_change=true` |
 | `last_updated_at` | Last updated UNIX timestamp. Present when `include_last_updated_at=true` |
 
@@ -68,7 +66,6 @@ Asset platform IDs can be resolved via `references/asset-platforms.md` →
 |---|---|
 | Description | Query full coin metadata and market data using an asset platform and contract address |
 | Path | `GET /coins/{id}/contract/{contract_address}` |
-| Plan | Free + Paid |
 
 ### Parameters
 
@@ -79,9 +76,7 @@ Asset platform IDs can be resolved via `references/asset-platforms.md` →
 
 ### Notes
 - Returns the same data structure as `GET /coins/{id}` in `references/coins.md`. Refer there for the full response field reference.
-- `twitter_followers` is no longer supported as of May 15, 2025.
 - Coin descriptions may contain `\r\n` newline escape sequences.
-- Cache / Update Frequency: every 60 seconds for all plans.
 
 ### Example Response
 ```json
@@ -121,54 +116,21 @@ See `references/coins.md` → `GET /coins/{id}` for the complete field reference
 |---|---|
 | Description | Query historical price, market cap, and 24hr volume time-series by contract address up to N days ago |
 | Path | `GET /coins/{id}/contract/{contract_address}/market_chart` |
-| Plan | Free + Paid |
 
 ### Parameters
 
 | Parameter | Type | Required | Description |
 |---|---|---|---|
-| `id` | string | Yes (path) | Asset platform ID. Refer to `references/asset-platforms.md` → `GET /asset_platforms` |
+| `id` | string | Yes (path) | Asset platform ID |
 | `contract_address` | string | Yes (path) | Token contract address |
-| `vs_currency` | string | Yes | Target currency. Refer to `references/utils.md` → `GET /simple/supported_vs_currencies` |
+| `vs_currency` | string | Yes | Target currency |
 | `days` | string | Yes | Number of days ago — any integer or `max` |
-| `interval` | string | No | Explicit granularity override — omit for auto (recommended). Options: `daily` (all plans), `5m` (**Enterprise only** — max 10 days back), `hourly` (**Enterprise only** — max 100 days back). Without this param, auto-granularity applies: 1 day → 5-minutely, 2–90 days → hourly, 90+ days → daily |
+| `interval` | string | No | Explicit granularity override — omit for auto. See `references/core.md` → Auto-granularity |
 | `precision` | string | No | Decimal places: `full` or `0`–`18` |
 
-### Notes
-- Leave `interval` empty for automatic granularity based on the `days` value:
-  - 1 day from now → 5-minutely
-  - 2–90 days from now → hourly
-  - Above 90 days from now → daily (00:00 UTC)
-- `interval=5m` and `interval=hourly` (explicit) are **Enterprise only** and bypass auto-granularity.
-- Non-Enterprise subscribers wanting hourly data should leave `interval` empty and use a range of 2–90 days.
-- Cache / Update Frequency: every 5 minutes for all plans.
-- The last completed UTC day is available 35 minutes after midnight (00:35 UTC).
+### Response
 
-### Example Response
-```json
-{
-  "prices": [
-    [1711843200000, 69702.31],
-    [1711929600000, 71246.95]
-  ],
-  "market_caps": [
-    [1711843200000, 1370247487960.09],
-    [1711929600000, 1401370211582.37]
-  ],
-  "total_volumes": [
-    [1711843200000, 16408802301.84],
-    [1711929600000, 19723005998.22]
-  ]
-}
-```
-
-### Response Fields
-
-| Field | Description |
-|---|---|
-| `prices` | Array of `[UNIX timestamp (ms), price]` pairs |
-| `market_caps` | Array of `[UNIX timestamp (ms), market cap]` pairs |
-| `total_volumes` | Array of `[UNIX timestamp (ms), 24hr volume]` pairs |
+Same shape as `references/coin-history.md` → `GET /coins/{id}/market_chart/range` (arrays of `[timestamp, value]` pairs for `prices`, `market_caps`, `total_volumes`).
 
 ---
 
@@ -178,53 +140,19 @@ See `references/coins.md` → `GET /coins/{id}` for the complete field reference
 |---|---|
 | Description | Query historical price, market cap, and 24hr volume within a specific date range by contract address |
 | Path | `GET /coins/{id}/contract/{contract_address}/market_chart/range` |
-| Plan | Free + Paid |
 
 ### Parameters
 
 | Parameter | Type | Required | Description |
 |---|---|---|---|
-| `id` | string | Yes (path) | Asset platform ID. Refer to `references/asset-platforms.md` → `GET /asset_platforms` |
+| `id` | string | Yes (path) | Asset platform ID |
 | `contract_address` | string | Yes (path) | Token contract address |
-| `vs_currency` | string | Yes | Target currency. Refer to `references/utils.md` → `GET /simple/supported_vs_currencies` |
-| `from` | string | Yes | Start date as ISO string (`YYYY-MM-DD` or `YYYY-MM-DDTHH:MM`, recommended) or UNIX timestamp |
-| `to` | string | Yes | End date as ISO string (`YYYY-MM-DD` or `YYYY-MM-DDTHH:MM`, recommended) or UNIX timestamp |
-| `interval` | string | No | Explicit granularity override — omit for auto (recommended). Options: `daily` (all plans), `5m` (**Enterprise only** — max 10-day range), `hourly` (**Enterprise only** — max 100-day range). Without this param, auto-granularity applies: 1 day → 5-minutely, 2–90 days → hourly, 90+ days → daily |
+| `vs_currency` | string | Yes | Target currency |
+| `from` | string | Yes | Start date — ISO string (`YYYY-MM-DD`) recommended, or UNIX timestamp |
+| `to` | string | Yes | End date — ISO string (`YYYY-MM-DD`) recommended, or UNIX timestamp |
+| `interval` | string | No | Explicit granularity override — omit for auto. See `references/core.md` → Auto-granularity |
 | `precision` | string | No | Decimal places: `full` or `0`–`18` |
 
-### Notes
-- Use ISO date strings (`YYYY-MM-DD`) for best compatibility over UNIX timestamps.
-- Leave `interval` empty for automatic granularity based on the date range:
-  - 1 day → 5-minutely
-  - 1 day (not current) or 2–90 days → hourly
-  - Above 90 days → daily (00:00 UTC)
-- `interval=5m` and `interval=hourly` (explicit) are **Enterprise only**.
-- Non-Enterprise subscribers wanting hourly data should leave `interval` empty and use a range within 2–90 days.
-- Cache varies by range: 1 day → 30s, 2–90 days → 30 min, above 90 days → 12 hours.
-- The last completed UTC day is available 35 minutes after midnight (00:35 UTC).
+### Response
 
-### Example Response
-```json
-{
-  "prices": [
-    [1704067241331, 42261.04],
-    [1704070847420, 42493.28]
-  ],
-  "market_caps": [
-    [1704067241331, 827596236151.20],
-    [1704070847420, 831531023621.41]
-  ],
-  "total_volumes": [
-    [1704067241331, 14305769170.95],
-    [1704070847420, 14130205376.17]
-  ]
-}
-```
-
-### Response Fields
-
-| Field | Description |
-|---|---|
-| `prices` | Array of `[UNIX timestamp (ms), price]` pairs |
-| `market_caps` | Array of `[UNIX timestamp (ms), market cap]` pairs |
-| `total_volumes` | Array of `[UNIX timestamp (ms), 24hr volume]` pairs |
+Same shape as `references/coin-history.md` → `GET /coins/{id}/market_chart/range`.

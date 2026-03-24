@@ -7,8 +7,6 @@ the user asks about onchain/GeckoTerminal categories, wants to browse pools by t
 **GeckoTerminal categories are distinct from CoinGecko categories.** For CoinGecko
 categories, use `references/categories.md` instead.
 
-Both endpoints are **Paid only (Analyst, Lite, Pro, Enterprise)**.
-
 ---
 
 ## `GET /onchain/categories` — Categories List
@@ -69,7 +67,7 @@ Both endpoints are **Paid only (Analyst, Lite, Pro, Enterprise)**.
 |---|---|---|---|
 | `category_id` | string | Yes | Category ID — refer to `GET /onchain/categories` above |
 | `include` | string | No | `base_token`, `quote_token`, `dex`, `network` (comma-separated). Sideloaded under `included` |
-| `page` | integer | No | Default: `1`. Max 20 pools per page. Beyond page 10 requires Analyst+ |
+| `page` | integer | No | Default: `1`. Max 20 pools per page |
 | `sort` | string | No | See sort values below. Default: `pool_created_at_desc` |
 
 **`sort` values:** `pool_created_at_desc` (default), `m5_trending`, `h1_trending`,
@@ -77,8 +75,8 @@ Both endpoints are **Paid only (Analyst, Lite, Pro, Enterprise)**.
 `h24_price_change_percentage_desc`
 
 ### Notes
-- Pool response shape matches `references/onchain-pools.md` with two additions: `h24_volume_usd` (string) and `h24_tx_count` (integer) are included directly in `attributes` (alongside the standard `volume_usd` object).
-- `relationships` includes `network` (in addition to `base_token`, `quote_token`, `dex`), even without `include=network`. To get full network attributes (name, `coingecko_asset_platform_id`), add `include=network`.
+- Pool response shape matches `references/onchain-pools.md` with two additions: `h24_volume_usd` (string) and `h24_tx_count` (integer) are included directly in `attributes`.
+- `relationships` includes `network` (in addition to `base_token`, `quote_token`, `dex`), even without `include=network`. To get full network attributes, add `include=network`.
 - To retrieve tokens for a category, use `include=base_token` and read the `included` array.
 
 ### Example Response

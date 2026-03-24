@@ -12,14 +12,10 @@ volume, BTC dominance, DeFi market cap, or historical global market chart data.
 |---|---|
 | Description | Query global cryptocurrency market data including total market cap, volume, and dominance |
 | Path | `GET /global` |
-| Plan | Free + Paid |
 
 ### Parameters
 
 None.
-
-### Notes
-- Cache / Update Frequency: every 10 minutes for all plans.
 
 ### Example Response
 ```json
@@ -68,7 +64,6 @@ None.
 |---|---|
 | Description | Query global DeFi market data based on the top 100 DeFi coins |
 | Path | `GET /global/decentralized_finance_defi` |
-| Plan | Free + Paid |
 
 ### Parameters
 
@@ -76,7 +71,6 @@ None.
 
 ### Notes
 - Data is derived from the top 100 DeFi cryptocurrencies only.
-- Cache / Update Frequency: every 60 minutes for all plans.
 
 ### Example Response
 ```json
@@ -113,7 +107,6 @@ None.
 |---|---|
 | Description | Query historical global total market cap and volume time-series |
 | Path | `GET /global/market_cap_chart` |
-| Plan | **Paid only** (Analyst, Lite, Pro, Enterprise) |
 
 ### Parameters
 
@@ -124,8 +117,6 @@ None.
 
 ### Notes
 - Granularity is automatic: 1 day → hourly; 2 days and above → daily.
-- The last completed UTC day is available 5 minutes after midnight (00:05 UTC). Cache expires at 00:05 UTC.
-- Cache / Update Frequency: every 1 minute.
 
 ### Example Response
 ```json

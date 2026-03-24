@@ -40,11 +40,10 @@ the confirmed plan tier to memory for future sessions.
 Once credentials are confirmed, follow this sequence for every request:
 
 1. **Identify the domain** — use the Reference index below to decide which file(s) to load.
-2. **Check tier gating** — if the endpoint is marked Enterprise or Analyst+, confirm the user
-   is on a qualifying plan before proceeding (see tier flags in the Reference index below).
-3. **Load the relevant reference file(s)** and construct the request.
-4. **Execute and handle errors** — auth and rate-limit error codes are documented in
-   `references/core.md`.
+2. **Load the relevant reference file(s)** and construct the request.
+3. **Execute and handle errors** — auth and rate-limit error codes are documented in
+   `references/core.md`. If the API returns error `10005`, the endpoint requires a
+   higher plan — inform the user and link them to https://www.coingecko.com/en/api/pricing.
 
 ## Reference index
 
@@ -58,14 +57,14 @@ load the file(s) that match the current request.
 | `references/core.md` | **Always read** — auth, methodology, rate limits |
 | `references/coins.md` | Coin prices, market data, metadata, tickers, gainers/losers |
 | `references/coin-history.md` | Historical charts, OHLC, time-range queries by coin ID |
-| `references/coin-supply.md` | Circulating/total supply charts — **Enterprise only** |
+| `references/coin-supply.md` | Circulating/total supply charts |
 | `references/contract.md` | Coin data or charts looked up by token contract address |
 | `references/asset-platforms.md` | Blockchain platform IDs, token lists |
 | `references/categories.md` | Coin categories and sector market data |
-| `references/exchanges.md` | Spot and DEX exchange data, tickers, volume charts, volume chart by date range |
+| `references/exchanges.md` | Spot and DEX exchange data, tickers, volume charts |
 | `references/derivatives.md` | Derivatives exchanges and tickers |
 | `references/treasury.md` | Public company/institution crypto treasury holdings |
-| `references/nfts.md` | NFT collection data, market data, charts, tickers (per-marketplace floor prices), contract address lookups |
+| `references/nfts.md` | NFT collection data, market data, charts, tickers |
 | `references/global.md` | Global market stats and DeFi data |
 | `references/utils.md` | API status, API key usage, supported currencies, search, trending coins/NFTs/categories, exchange rates |
 
@@ -75,7 +74,7 @@ load the file(s) that match the current request.
 |---|---|
 | `references/onchain-networks.md` | Supported networks and DEXes (ID resolution) |
 | `references/onchain-pools.md` | Pool discovery, trending/new pools, megafilter |
-| `references/onchain-tokens.md` | Token data, price by contract address (Paid); holders and traders endpoints — **Analyst+** |
+| `references/onchain-tokens.md` | Token data, price by contract address, holders and traders |
 | `references/onchain-ohlcv-trades.md` | OHLCV candles and trade history for pools/tokens |
 | `references/onchain-categories.md` | On-chain pool categories (GeckoTerminal-specific) |
 

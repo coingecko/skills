@@ -5,9 +5,7 @@ current holdings, historical holding charts, and transaction history. Load this 
 when the user asks about corporate Bitcoin treasuries, government crypto holdings,
 MicroStrategy/Strategy holdings, treasury transactions, or entity-level crypto data.
 
-Entity IDs can be resolved via `GET /entities/list` below. Coin IDs can be resolved
-via `references/utils.md` → `GET /search` if the target is known, or
-`references/coins.md` → `GET /coins/list` for the full ID map.
+Entity IDs can be resolved via `GET /entities/list` below.
 
 ---
 
@@ -17,7 +15,6 @@ via `references/utils.md` → `GET /search` if the target is known, or
 |---|---|
 | Description | Query all supported public company and government entities with their IDs |
 | Path | `GET /entities/list` |
-| Plan | Free + Paid |
 
 ### Parameters
 
@@ -26,9 +23,6 @@ via `references/utils.md` → `GET /search` if the target is known, or
 | `entity_type` | string | No | Filter by type: `company` or `government`. Default: all |
 | `per_page` | integer | No | Results per page. Default: `100`. Max: `250` |
 | `page` | integer | No | Page number. Default: `1` |
-
-### Notes
-- Cache / Update Frequency: every 5 minutes for all plans.
 
 ### Example Response
 ```json
@@ -55,7 +49,6 @@ via `references/utils.md` → `GET /search` if the target is known, or
 |---|---|
 | Description | Query all companies or governments holding a specific coin, with aggregate stats |
 | Path | `GET /{entity}/public_treasury/{coin_id}` |
-| Plan | Free + Paid |
 
 ### Parameters
 
@@ -66,10 +59,6 @@ via `references/utils.md` → `GET /search` if the target is known, or
 | `per_page` | integer | No | Results per page. Default: `250`. Max: `250` |
 | `page` | integer | No | Page number. Default: `1` |
 | `order` | string | No | Sort order. Default: `total_holdings_usd_desc`. Options: `total_holdings_usd_desc`, `total_holdings_usd_asc` |
-
-### Notes
-- Results are sorted by total holdings descending by default.
-- Cache / Update Frequency: every 5 minutes for all plans.
 
 ### Example Response
 ```json
@@ -115,7 +104,6 @@ via `references/utils.md` → `GET /search` if the target is known, or
 |---|---|
 | Description | Query a single entity's full treasury holdings with optional change data |
 | Path | `GET /public_treasury/{entity_id}` |
-| Plan | Free + Paid |
 
 ### Parameters
 
@@ -124,9 +112,6 @@ via `references/utils.md` → `GET /search` if the target is known, or
 | `entity_id` | string | Yes (path) | Entity ID. Refer to `GET /entities/list` above |
 | `holding_amount_change` | string | No | Include holding amount change for specified timeframes, comma-separated. Valid values: `7d`, `14d`, `30d`, `90d`, `1y`, `ytd` |
 | `holding_change_percentage` | string | No | Include holding change percentage for specified timeframes, comma-separated. Valid values: `7d`, `14d`, `30d`, `90d`, `1y`, `ytd` |
-
-### Notes
-- Cache / Update Frequency: every 5 minutes for all plans.
 
 ### Example Response
 ```json
@@ -195,7 +180,6 @@ via `references/utils.md` → `GET /search` if the target is known, or
 |---|---|
 | Description | Query historical holding amount and USD value chart for an entity's specific coin |
 | Path | `GET /public_treasury/{entity_id}/{coin_id}/holding_chart` |
-| Plan | Free + Paid (historical depth varies by plan) |
 
 ### Parameters
 
@@ -208,16 +192,7 @@ via `references/utils.md` → `GET /search` if the target is known, or
 
 ### Notes
 - Data available from August 2020 onwards.
-- Historical depth is plan-gated:
-
-| Plan | Max period | Available `days` values |
-|---|---|---|
-| Demo / Free | 1 year | `7, 14, 30, 90, 180, 365` |
-| Basic | 2 years | `7, 14, 30, 90, 180, 365, 730` |
-| Analyst and above | Full | `7, 14, 30, 90, 180, 365, 730, max` |
-
-- When `include_empty_intervals=false` (default), only intervals with transaction activity are returned. When `true`, all intervals are returned with the most recent known holdings.
-- Cache / Update Frequency: every 5 minutes for all plans.
+- When `include_empty_intervals=false` (default), only intervals with transaction activity are returned.
 
 ### Example Response
 ```json
@@ -248,7 +223,6 @@ via `references/utils.md` → `GET /search` if the target is known, or
 |---|---|
 | Description | Query an entity's cryptocurrency buy/sell transaction history |
 | Path | `GET /public_treasury/{entity_id}/transaction_history` |
-| Plan | Free + Paid (pagination restricted by plan) |
 
 ### Parameters
 
@@ -256,14 +230,12 @@ via `references/utils.md` → `GET /search` if the target is known, or
 |---|---|---|---|
 | `entity_id` | string | Yes (path) | Entity ID. Refer to `GET /entities/list` above |
 | `per_page` | number | No | Results per page. Default: `100`. Max: `250` |
-| `page` | number | No | Page number. Default: `1`. Pages beyond page 1 require **Analyst plan or above** |
+| `page` | number | No | Page number. Default: `1` |
 | `order` | string | No | Sort order. Default: `date_desc`. Options: `date_desc`, `date_asc`, `holding_net_change_desc`, `holding_net_change_asc`, `transaction_value_usd_desc`, `transaction_value_usd_asc`, `average_cost_desc`, `average_cost_asc` |
-| `coin_ids` | string | No | Filter by coin IDs, comma-separated. Refer to `references/coins.md` → `GET /coins/list` |
+| `coin_ids` | string | No | Filter by coin IDs, comma-separated |
 
 ### Notes
 - Data available from August 2020 onwards.
-- `page > 1` is exclusive to Analyst plan and above.
-- Cache / Update Frequency: every 5 minutes for all plans.
 
 ### Example Response
 ```json

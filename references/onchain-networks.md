@@ -13,7 +13,6 @@ required params throughout `references/onchain-pools.md`,
 |---|---|
 | Description | Query all networks supported on GeckoTerminal |
 | Path | `GET /onchain/networks` |
-| Plan | Free + Paid |
 
 ### Parameters
 
@@ -25,8 +24,7 @@ required params throughout `references/onchain-pools.md`,
 - Results are paginated. Iterate `page` to retrieve all networks.
 - `data[].id` is the `network` path param used in all other onchain endpoints.
 - `data[].attributes.coingecko_asset_platform_id` maps to the CoinGecko asset
-  platform ID used in `references/asset-platforms.md` and
-  `references/contract.md`.
+  platform ID used in `references/asset-platforms.md` and `references/contract.md`.
 
 ### Example Response
 ```json
@@ -77,7 +75,6 @@ required params throughout `references/onchain-pools.md`,
 |---|---|
 | Description | Query all DEXes supported on a given network on GeckoTerminal |
 | Path | `GET /onchain/networks/{network}/dexes` |
-| Plan | Free + Paid |
 
 ### Parameters
 
@@ -104,11 +101,6 @@ required params throughout `references/onchain-pools.md`,
       "id": "uniswap_v3",
       "type": "dex",
       "attributes": { "name": "Uniswap V3" }
-    },
-    {
-      "id": "sushiswap",
-      "type": "dex",
-      "attributes": { "name": "SushiSwap" }
     }
   ]
 }
