@@ -54,6 +54,12 @@ Once credentials are confirmed, follow this sequence for every request:
 Load the relevant reference file based on what the user is asking for. You only need to
 load the file(s) that match the current request.
 
+### Inspiration & Use cases
+
+If the user asks what they can build, wants project ideas, or asks an exploratory
+question like "what data is available?" — load `references/common-use-cases.md` instead
+of the domain-specific files below, then follow its pointers to drill deeper.
+
 ### CoinGecko (aggregated)
 
 | File | When to load |
