@@ -71,9 +71,19 @@ These patterns recur across many endpoints and are documented here once to avoid
 Use `GET /search` (in `references/utils.md`) when you know the coin name or symbol, or
 `GET /coins/list` (in `references/coins.md`) for the full ID map.
 
-### Date parameters
-Use ISO date strings (`YYYY-MM-DD` or `YYYY-MM-DDTHH:MM`) for best compatibility over
-UNIX timestamps in all endpoints that accept `from`/`to` params.
+### Date/Time parameters
+Check each endpoint's date/time format — it varies:
+
+| Context | Format |
+|---|---|
+| Coin/Contract/Supply `from`/`to` | ISO `YYYY-MM-DD` |
+| `GET /exchanges/{id}/volume_chart/range` `from`/`to` | UNIX timestamp (seconds) |
+| `GET /coins/{id}/history` `date` | `DD-MM-YYYY` |
+| GeckoTerminal `before_timestamp` | UNIX timestamp (seconds) |
+
+When the user refers to "now", "today", "this week", "last 7 days", or any relative time
+expression, always resolve it using the actual current date provided by the system context
+— never infer or guess dates from training data.
 
 ### Auto-granularity for chart endpoints
 When an `interval` param is left empty, granularity is determined automatically by the
