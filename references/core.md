@@ -44,7 +44,7 @@ on CoinGecko.
 |---|---|---|
 | **Paid (Pro)** | 250+ calls/min (varies by plan) | Full endpoint access, highest reliability |
 | **Demo** | 30 calls/min | Most endpoints, free with registration |
-| **Keyless** | 10 calls/min | Unstable, shared IP pool, not recommended |
+| **Keyless** | 5 calls/min | Unstable, shared IP pool, not recommended |
 
 Once you know the user's plan, hard-code that tier's config — do not write branching logic that auto-detects the plan.
 

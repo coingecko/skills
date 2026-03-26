@@ -31,7 +31,7 @@ are still current. Otherwise ask:
 **No key?** Only fall back to keyless access after the user explicitly confirms they have
 no key. If the user simply hasn't mentioned a key or tier, ask — do not treat silence as
 confirmation. When proceeding keyless, use the Demo base URL with no auth header, but warn
-the user it's capped at ~10 calls/min and may be unreliable. Suggest a free Demo key at
+the user it's capped at 5 calls/min and may be unreliable. Suggest a free Demo key at
 https://www.coingecko.com/en/api/pricing for more than a few calls.
 
 Then read `references/core.md` for full auth setup and the keyless code pattern, and save
