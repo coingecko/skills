@@ -18,36 +18,65 @@ You have access to the CoinGecko API (aggregated data) and the GeckoTerminal API
 Both APIs share the same API key and plan tier. GeckoTerminal endpoints use the
 same base URL as CoinGecko plus an `/onchain` path prefix (details in `references/core.md`).
 
-## Before anything else
-
-Credentials must come first — base URL and auth header differ by tier, and both key types
-start with `CG-` so you cannot infer the plan from the key alone.
-
-**Check memory first.** If the user's plan tier and API key are already saved, confirm they
-are still current. Otherwise ask:
-1. **Plan tier** — paid (Pro) or free (Demo)?
-2. **API key** — their `CG-…` key?
-
-**No key?** Only fall back to keyless access after the user explicitly confirms they have
-no key. If the user simply hasn't mentioned a key or tier, ask — do not treat silence as
-confirmation. When proceeding keyless, use the Demo base URL with no auth header, but warn
-the user it's capped at 5 calls/min and may be unreliable. Suggest a free Demo key at
-https://www.coingecko.com/en/api/pricing for more than a few calls.
-
-Then read `references/core.md` for full auth setup and the keyless code pattern, and save
-the confirmed plan tier to memory for future sessions.
-
 ## Workflow
 
-Once credentials are confirmed, follow this sequence for every request:
+Follow these steps **in strict order**. Do NOT skip ahead. Do NOT write code, plan an
+architecture, or make any API call until step 1 is fully resolved.
 
-1. **Identify the domain** — use the Reference index below to decide which file(s) to load.
-2. **Load the relevant reference file(s)** and construct the request.
-3. **Execute and handle errors** — auth and rate-limit error codes are documented in
-   `references/core.md`. If the API returns error `10005`, the endpoint requires a
-   higher plan — inform the user and link them to https://www.coingecko.com/en/api/pricing.
-   If you get error `10010` or `10011`, you've used the wrong base URL for the key type —
-   swap URLs per `core.md`'s error table and retry automatically.
+### Step 0 — Confirm credentials (BLOCKING)
+
+STOP. Before doing anything else, you must resolve the user's API tier. This is a hard
+prerequisite — not a suggestion, not something to revisit later, and not something to skip
+because "keyless should work for this request."
+
+**Why this exists:** Keyless and Demo tiers have restrictions that silently break multi-step
+tasks. Example failure pattern:
+> User: "If I invested in Bitcoin 5 years ago, how much would it be worth today?"
+> Bad behavior: Claude assumes keyless works, starts building a dashboard, then hits
+> error `10012` because keyless/Demo cannot fetch historical data beyond 365 days.
+> The user wasted time and rate-limit calls on something that was never going to work.
+
+The correct behavior is to ask for credentials first, identify that "5 years ago" exceeds
+keyless/Demo limits, and tell the user upfront — before writing a single line of code.
+
+**Procedure:**
+1. **Check memory** for a previously saved plan tier and API key.
+2. If found, confirm they are still current. If not found, **ask the user**:
+   - **Plan tier** — paid (Pro) or free (Demo)?
+   - **API key** — their `CG-…` key?
+3. **No key?** Only fall back to keyless after the user *explicitly* says they have no key.
+   If the user simply hasn't mentioned a key, **ask** — do not treat silence as "no key."
+   When proceeding keyless, warn: capped at 5 calls/min, unstable, and data restrictions
+   apply. Suggest a free Demo key at https://www.coingecko.com/en/api/pricing.
+4. **Assess feasibility against the confirmed tier.** Check whether the request involves
+   data or endpoints that exceed the tier's limits — e.g. historical data beyond 365 days
+   (keyless/Demo), Enterprise-only intervals (`5m`), or paid-only endpoints. If it does,
+   tell the user *before* attempting any call. Do not make the call and let it fail.
+5. Read `references/core.md` for full auth setup and save the confirmed tier to memory.
+
+**Do NOT proceed to step 1 until this step is fully resolved.**
+
+### Step 1 — Identify the domain
+
+Use the Reference index below to decide which file(s) to load.
+
+### Step 2 — Load references and construct the request
+
+Load the relevant reference file(s) and build the API call.
+
+### Step 3 — Execute and handle errors
+
+Auth and rate-limit error codes are documented in `references/core.md`. If the API returns
+error `10005`, the endpoint requires a higher plan — inform the user and link them to
+https://www.coingecko.com/en/api/pricing. If you get error `10010` or `10011`, you've used
+the wrong base URL for the key type — swap URLs per `core.md`'s error table and retry
+automatically.
+
+**"Failed to fetch" or network errors:** If a request fails with no HTTP status (e.g.
+"Failed to fetch", `TypeError`), the cause is almost always a **wrong base URL** — not
+CORS. The CoinGecko API does not block browser requests via CORS. Re-read `core.md`'s
+"Network-level failures" section and fix the URL/auth configuration. Never suggest CORS
+workarounds or proxy routing as a fix.
 
 ## Reference index
 
