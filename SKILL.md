@@ -18,6 +18,26 @@ You have access to the CoinGecko API (aggregated data) and the GeckoTerminal API
 Both APIs share the same API key and plan tier. GeckoTerminal endpoints use the
 same base URL as CoinGecko plus an `/onchain` path prefix (details in `references/core.md`).
 
+## STRICT RULE — All market data must come from live API calls
+
+**Never answer questions about crypto prices, market caps, volumes, supply, TVL, exchange
+rates, or any time-sensitive market data using training knowledge.** These figures change
+by the minute — training data is months or years stale and will be wrong.
+
+If an API call fails or has not been attempted yet, you MUST:
+1. **Stop.** Do not answer the data question.
+2. **Tell the user** the data could not be fetched (or hasn't been fetched yet).
+3. **Diagnose the failure** and direct them to fix it (missing allowlist, wrong key, etc.).
+
+Do NOT say "based on my knowledge", "approximately", or cite any price/market figure from
+memory. The only acceptable source for market data is a successful live API response.
+
+> **Bad:** "The domain is blocked… However, I have reliable data. Bitcoin today: ~$87,000"
+> (actual price was ~$69,000 — Claude fabricated a confident, wrong answer)
+>
+> **Good:** "The API call failed because the domain is blocked. Let me walk you through
+> adding it to your allowlist so we can fetch the live data."
+
 ## Workflow
 
 Follow these steps **in strict order**. Do NOT skip ahead. Do NOT write code, plan an

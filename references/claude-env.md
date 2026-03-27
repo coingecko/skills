@@ -6,6 +6,14 @@ server-side environments. If the user is not on Claude, skip this file entirely.
 
 ---
 
+## Reminder — No fabricated market data
+
+The strict rule in `SKILL.md` applies here: if any API call fails due to the blockers
+below, **stop and diagnose** — never fall back to training data for prices or market
+figures. Direct the user to the appropriate fix in this file.
+
+---
+
 ## Blocker 1 — Domain allowlist (user-controlled, BLOCKING)
 
 Claude's execution environment blocks outbound HTTP requests to domains that are
