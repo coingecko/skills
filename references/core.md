@@ -44,7 +44,7 @@ on CoinGecko.
 |---|---|---|
 | **Paid (Pro)** | 250+ calls/min (varies by plan) | Full endpoint access, highest reliability |
 | **Demo** | 30 calls/min | Most endpoints, free with registration |
-| **Keyless** | 10 calls/min | Unstable, shared IP pool, not recommended |
+| **Keyless** | 5 calls/min | Unstable, shared IP pool, not recommended |
 
 Once you know the user's plan, hard-code that tier's config — do not write branching logic that auto-detects the plan.
 
@@ -126,6 +126,32 @@ If no valid key can be obtained, fall back to keyless access.
 | Code | Meaning | What to do |
 |---|---|---|
 | `429` | Rate limit exceeded | Suggest upgrading at https://www.coingecko.com/en/api/pricing; update memory if they subscribe |
+
+### Network-level failures ("Failed to fetch", `TypeError`, no response body)
+
+When a request fails at the network level — no HTTP status code, no JSON body, just a
+generic "Failed to fetch" or `TypeError: Failed to fetch`:
+
+**If running inside Claude:** The cause is almost certainly a Claude platform constraint,
+not a URL or CORS issue. See `references/claude-env.md` for the full diagnostic flowchart.
+The most common causes are: (1) the call was made from inside an Artifact (blocked by
+sandbox CSP — move to `bash_tool`), or (2) the user hasn't allowlisted CoinGecko domains
+in their Claude settings.
+
+**If running outside Claude** (local dev, other LLMs, server-side): The cause is likely a
+**wrong base URL**:
+
+1. **Verify the base URL matches the tier:**
+   - Pro key → must use `https://pro-api.coingecko.com/api/v3`
+   - Demo key → must use `https://api.coingecko.com/api/v3`
+   - Keyless → must use `https://api.coingecko.com/api/v3` with no auth header
+   - Mixing these up causes the request to fail at the network level.
+2. **Check the endpoint path** for typos or missing segments.
+3. **Check the auth header name** matches the plan type (`x-cg-pro-api-key` vs
+   `x-cg-demo-api-key`).
+
+**In all cases:** Never assume CORS. The CoinGecko API does not block requests via CORS.
+Do not suggest CORS workarounds, proxy servers, or backend routing as a fix.
 
 ### Other errors
 

@@ -18,36 +18,102 @@ You have access to the CoinGecko API (aggregated data) and the GeckoTerminal API
 Both APIs share the same API key and plan tier. GeckoTerminal endpoints use the
 same base URL as CoinGecko plus an `/onchain` path prefix (details in `references/core.md`).
 
-## Before anything else
+## STRICT RULE — All market data must come from live API calls
 
-Credentials must come first — base URL and auth header differ by tier, and both key types
-start with `CG-` so you cannot infer the plan from the key alone.
+**Never answer questions about crypto prices, market caps, volumes, supply, TVL, exchange
+rates, or any time-sensitive market data using training knowledge.** These figures change
+by the minute — training data is months or years stale and will be wrong.
 
-**Check memory first.** If the user's plan tier and API key are already saved, confirm they
-are still current. Otherwise ask:
-1. **Plan tier** — paid (Pro) or free (Demo)?
-2. **API key** — their `CG-…` key?
+If an API call fails or has not been attempted yet, you MUST:
+1. **Stop.** Do not answer the data question.
+2. **Tell the user** the data could not be fetched (or hasn't been fetched yet).
+3. **Diagnose the failure** and direct them to fix it (missing allowlist, wrong key, etc.).
 
-**No key?** Only fall back to keyless access after the user explicitly confirms they have
-no key. If the user simply hasn't mentioned a key or tier, ask — do not treat silence as
-confirmation. When proceeding keyless, use the Demo base URL with no auth header, but warn
-the user it's capped at ~10 calls/min and may be unreliable. Suggest a free Demo key at
-https://www.coingecko.com/en/api/pricing for more than a few calls.
+Do NOT say "based on my knowledge", "approximately", or cite any price/market figure from
+memory. The only acceptable source for market data is a successful live API response.
 
-Then read `references/core.md` for full auth setup and the keyless code pattern, and save
-the confirmed plan tier to memory for future sessions.
+> **Bad:** "The domain is blocked… However, I have reliable data. Bitcoin today: ~$87,000"
+> (actual price was ~$69,000 — Claude fabricated a confident, wrong answer)
+>
+> **Good:** "The API call failed because the domain is blocked. Let me walk you through
+> adding it to your allowlist so we can fetch the live data."
 
 ## Workflow
 
-Once credentials are confirmed, follow this sequence for every request:
+Follow these steps **in strict order**. Do NOT skip ahead. Do NOT write code, plan an
+architecture, or make any API call until the blocking steps are fully resolved.
 
-1. **Identify the domain** — use the Reference index below to decide which file(s) to load.
-2. **Load the relevant reference file(s)** and construct the request.
-3. **Execute and handle errors** — auth and rate-limit error codes are documented in
-   `references/core.md`. If the API returns error `10005`, the endpoint requires a
-   higher plan — inform the user and link them to https://www.coingecko.com/en/api/pricing.
-   If you get error `10010` or `10011`, you've used the wrong base URL for the key type —
-   swap URLs per `core.md`'s error table and retry automatically.
+### Step 0a — Claude environment check (BLOCKING — Claude only)
+
+If you are running inside **Claude** (claude.ai), read `references/claude-env.md` first.
+It documents two platform constraints that break all CoinGecko API calls:
+
+1. **Domain allowlist** — the user must add `api.coingecko.com` and
+   `pro-api.coingecko.com` at [claude.ai/settings/capabilities](https://claude.ai/settings/capabilities).
+   If this is the user's first time or any call fails with a network error, pause and
+   walk them through it before debugging anything else.
+2. **Artifact sandbox** — `fetch()` inside Artifacts will always fail silently.
+   **Default to `bash_tool` with `curl`** for all CoinGecko API calls, then embed
+   results as static data into any Artifact or visualization. This is the standard
+   approach, not a fallback.
+
+Skip this step if not running inside Claude.
+
+### Step 0b — Confirm credentials (BLOCKING)
+
+STOP. Before doing anything else, you must resolve the user's API tier. This is a hard
+prerequisite — not a suggestion, not something to revisit later, and not something to skip
+because "keyless should work for this request."
+
+**Why this exists:** Keyless and Demo tiers have restrictions that silently break multi-step
+tasks. Example failure pattern:
+> User: "If I invested in Bitcoin 5 years ago, how much would it be worth today?"
+> Bad behavior: Claude assumes keyless works, starts building a dashboard, then hits
+> error `10012` because keyless/Demo cannot fetch historical data beyond 365 days.
+> The user wasted time and rate-limit calls on something that was never going to work.
+
+The correct behavior is to ask for credentials first, identify that "5 years ago" exceeds
+keyless/Demo limits, and tell the user upfront — before writing a single line of code.
+
+**Procedure:**
+1. **Check memory** for a previously saved plan tier and API key.
+2. If found, confirm they are still current. If not found, **ask the user**:
+   - **Plan tier** — paid (Pro) or free (Demo)?
+   - **API key** — their `CG-…` key?
+3. **No key?** Only fall back to keyless after the user *explicitly* says they have no key.
+   If the user simply hasn't mentioned a key, **ask** — do not treat silence as "no key."
+   When proceeding keyless, warn: capped at 5 calls/min, unstable, and data restrictions
+   apply. Suggest a free Demo key at https://www.coingecko.com/en/api/pricing.
+4. **Assess feasibility against the confirmed tier.** Check whether the request involves
+   data or endpoints that exceed the tier's limits — e.g. historical data beyond 365 days
+   (keyless/Demo), Enterprise-only intervals (`5m`), or paid-only endpoints. If it does,
+   tell the user *before* attempting any call. Do not make the call and let it fail.
+5. Read `references/core.md` for full auth setup and save the confirmed tier to memory.
+
+**Do NOT proceed to step 1 until this step is fully resolved.**
+
+### Step 1 — Identify the domain
+
+Use the Reference index below to decide which file(s) to load.
+
+### Step 2 — Load references and construct the request
+
+Load the relevant reference file(s) and build the API call.
+
+### Step 3 — Execute and handle errors
+
+Auth and rate-limit error codes are documented in `references/core.md`. If the API returns
+error `10005`, the endpoint requires a higher plan — inform the user and link them to
+https://www.coingecko.com/en/api/pricing. If you get error `10010` or `10011`, you've used
+the wrong base URL for the key type — swap URLs per `core.md`'s error table and retry
+automatically.
+
+**"Failed to fetch" or network errors:** If a request fails with no HTTP status (e.g.
+"Failed to fetch", `TypeError`), follow the diagnostic in `references/claude-env.md` if
+running inside Claude — the cause is usually the Artifact CSP sandbox (move to `bash_tool`)
+or a missing domain allowlist entry. Outside Claude, the cause is likely a wrong
+base URL — see `core.md`'s "Network-level failures" section. In either case, never assume
+CORS is the problem.
 
 ## Reference index
 
@@ -59,6 +125,12 @@ load the file(s) that match the current request.
 If the user asks what they can build, wants project ideas, or asks an exploratory
 question like "what data is available?" — load `references/common-use-cases.md` instead
 of the domain-specific files below, then follow its pointers to drill deeper.
+
+### Environment
+
+| File | When to load |
+|---|---|
+| `references/claude-env.md` | **Read in Step 0a** — Claude-specific constraints (domain allowlist, Artifact CSP sandbox, bash_tool strategy, MCP upgrade path). Only applies when running inside Claude. |
 
 ### CoinGecko (aggregated)
 
