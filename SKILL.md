@@ -21,9 +21,25 @@ same base URL as CoinGecko plus an `/onchain` path prefix (details in `reference
 ## Workflow
 
 Follow these steps **in strict order**. Do NOT skip ahead. Do NOT write code, plan an
-architecture, or make any API call until step 1 is fully resolved.
+architecture, or make any API call until the blocking steps are fully resolved.
 
-### Step 0 — Confirm credentials (BLOCKING)
+### Step 0a — Claude environment check (BLOCKING — Claude only)
+
+If you are running inside **Claude** (claude.ai), read `references/claude-env.md` first.
+It documents two platform constraints that break all CoinGecko API calls:
+
+1. **Domain allowlist** — the user must add `api.coingecko.com` and
+   `pro-api.coingecko.com` at [claude.ai/settings/capabilities](https://claude.ai/settings/capabilities).
+   If this is the user's first time or any call fails with a network error, pause and
+   walk them through it before debugging anything else.
+2. **Artifact sandbox** — `fetch()` inside Artifacts will always fail silently.
+   **Default to `bash_tool` with `curl`** for all CoinGecko API calls, then embed
+   results as static data into any Artifact or visualization. This is the standard
+   approach, not a fallback.
+
+Skip this step if not running inside Claude.
+
+### Step 0b — Confirm credentials (BLOCKING)
 
 STOP. Before doing anything else, you must resolve the user's API tier. This is a hard
 prerequisite — not a suggestion, not something to revisit later, and not something to skip
@@ -73,10 +89,11 @@ the wrong base URL for the key type — swap URLs per `core.md`'s error table an
 automatically.
 
 **"Failed to fetch" or network errors:** If a request fails with no HTTP status (e.g.
-"Failed to fetch", `TypeError`), the cause is almost always a **wrong base URL** — not
-CORS. The CoinGecko API does not block browser requests via CORS. Re-read `core.md`'s
-"Network-level failures" section and fix the URL/auth configuration. Never suggest CORS
-workarounds or proxy routing as a fix.
+"Failed to fetch", `TypeError`), follow the diagnostic in `references/claude-env.md` if
+running inside Claude — the cause is usually the Artifact CSP sandbox (move to `bash_tool`)
+or a missing domain allowlist entry. Outside Claude, the cause is likely a wrong
+base URL — see `core.md`'s "Network-level failures" section. In either case, never assume
+CORS is the problem.
 
 ## Reference index
 
@@ -88,6 +105,12 @@ load the file(s) that match the current request.
 If the user asks what they can build, wants project ideas, or asks an exploratory
 question like "what data is available?" — load `references/common-use-cases.md` instead
 of the domain-specific files below, then follow its pointers to drill deeper.
+
+### Environment
+
+| File | When to load |
+|---|---|
+| `references/claude-env.md` | **Read in Step 0a** — Claude-specific constraints (domain allowlist, Artifact CSP sandbox, bash_tool strategy, MCP upgrade path). Only applies when running inside Claude. |
 
 ### CoinGecko (aggregated)
 

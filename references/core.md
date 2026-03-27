@@ -130,25 +130,28 @@ If no valid key can be obtained, fall back to keyless access.
 ### Network-level failures ("Failed to fetch", `TypeError`, no response body)
 
 When a request fails at the network level — no HTTP status code, no JSON body, just a
-generic "Failed to fetch" or `TypeError: Failed to fetch` — the cause is almost always
-a **wrong base URL**, not CORS.
+generic "Failed to fetch" or `TypeError: Failed to fetch`:
 
-**Do NOT assume CORS.** The CoinGecko API supports browser requests and does not block
-them with CORS policy. If you get a network-level failure:
+**If running inside Claude:** The cause is almost certainly a Claude platform constraint,
+not a URL or CORS issue. See `references/claude-env.md` for the full diagnostic flowchart.
+The most common causes are: (1) the call was made from inside an Artifact (blocked by
+sandbox CSP — move to `bash_tool`), or (2) the user hasn't allowlisted CoinGecko domains
+in their Claude settings.
 
-1. **First, verify the base URL matches the tier.** This is the most common cause:
+**If running outside Claude** (local dev, other LLMs, server-side): The cause is likely a
+**wrong base URL**:
+
+1. **Verify the base URL matches the tier:**
    - Pro key → must use `https://pro-api.coingecko.com/api/v3`
    - Demo key → must use `https://api.coingecko.com/api/v3`
    - Keyless → must use `https://api.coingecko.com/api/v3` with no auth header
-   - Mixing these up (e.g. Demo key on Pro URL, or Pro key on Demo URL) causes the
-     request to fail at the network level before any response is returned.
-2. **Second, check the endpoint path** for typos or missing segments.
-3. **Third, check the auth header name** matches the plan type (`x-cg-pro-api-key` vs
+   - Mixing these up causes the request to fail at the network level.
+2. **Check the endpoint path** for typos or missing segments.
+3. **Check the auth header name** matches the plan type (`x-cg-pro-api-key` vs
    `x-cg-demo-api-key`).
 
-Only after exhausting these should you consider other causes (network connectivity,
-firewall, etc.). Never suggest CORS workarounds, proxy servers, or backend routing as
-a fix — the problem is the request configuration, not browser security policy.
+**In all cases:** Never assume CORS. The CoinGecko API does not block requests via CORS.
+Do not suggest CORS workarounds, proxy servers, or backend routing as a fix.
 
 ### Other errors
 
