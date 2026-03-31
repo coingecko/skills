@@ -20,6 +20,7 @@ An installable package that gives AI agents built-in knowledge of the [CoinGecko
 
 > [!NOTE]
 > Claude.ai users on paid plans should add `api.coingecko.com` and `pro-api.coingecko.com` to their domain allowlist at [claude.ai/settings/capabilities](https://claude.ai/settings/capabilities).
+> Follow this guide here: http://docs.coingecko.com/docs/skills#allowlist-coingecko-domains-claude-paid-plans-only
 
 ### Agents / LLMs
 
@@ -50,28 +51,28 @@ mv coingecko-skills ~/.claude/skills/coingecko
 ## What's Inside
 
 ```
-SKILL.md              # Main entry point — workflow, reference index
+SKILL.md                     # Main entry point — workflow, reference index
 references/
-  ├── core.md           # Auth, rate limits, methodology (always read)
-  ├── claude-env.md     # Claude-specific constraints & workarounds
-  ├── common-use-cases.md
-  ├── coins.md          # Prices, market data, metadata, gainers/losers
-  ├── coin-history.md   # Historical charts, OHLC, time-range queries
-  ├── coin-supply.md    # Circulating/total supply charts
-  ├── contract.md       # Lookup by token contract address
-  ├── asset-platforms.md
-  ├── categories.md     # Coin categories & sector market data
-  ├── exchanges.md      # Spot & DEX exchange data, volume charts
-  ├── derivatives.md    # Derivatives exchanges & tickers
-  ├── treasury.md       # Public company crypto treasury holdings
-  ├── nfts.md           # NFT collections, market data, charts
-  ├── global.md         # Global market stats & DeFi data
-  ├── utils.md          # Search, trending, exchange rates, API status
-  ├── onchain-networks.md
-  ├── onchain-pools.md  # Pool discovery, trending/new pools
-  ├── onchain-tokens.md # Token data, holders, traders
-  ├── onchain-ohlcv-trades.md
-  └── onchain-categories.md
+  ├── core.md                    # Auth, rate limits, methodology (always read)
+  ├── claude-env.md              # Claude-specific constraints & workarounds
+  ├── common-use-cases.md        # Common workflows for price queries, historical data, etc.
+  ├── coins.md                   # Prices, market data, metadata, gainers/losers
+  ├── coin-history.md            # Historical charts, OHLC, time-range queries
+  ├── coin-supply.md             # Circulating/total supply charts
+  ├── contract.md                # Lookup by token contract address
+  ├── asset-platforms.md         # Supported blockchains for token contracts, token lists
+  ├── categories.md              # Coin categories & sector market data
+  ├── exchanges.md               # Spot & DEX exchange data, volume charts
+  ├── derivatives.md             # Derivatives exchanges & tickers
+  ├── treasury.md                # Public company crypto treasury holdings
+  ├── nfts.md                    # NFT collections, market data, charts
+  ├── global.md                  # Global market stats & DeFi data
+  ├── utils.md                   # Search, trending, exchange rates, API status
+  ├── onchain-networks.md        # Supported networks and DEXes (ID mapping)
+  ├── onchain-pools.md           # Pool discovery, trending/new pools
+  ├── onchain-tokens.md          # Token data, holders, traders
+  ├── onchain-ohlcv-trades.md    # Onchain OHLCV and trade data
+  └── onchain-categories.md      # Onchain category data (GeckoTerminal specific)
 ```
 
 ---
@@ -97,6 +98,8 @@ Have fun experimenting!
 ## Feedback
 
 Tell us how you're using the CoinGecko SKILL and what we should improve — reach out to `eason.lim@coingecko[dot]com`.
+
+or open a GitHub issue: [coingecko/skills/issues](https://github.com/coingecko/skills/issues?labels=community)
 
 ---
 
