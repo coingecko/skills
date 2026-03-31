@@ -19,7 +19,7 @@ An installable package that gives AI agents built-in knowledge of the [CoinGecko
 4. Upload the `skills-main.zip` file
 
 > [!NOTE]
-> Claude.ai users on paid plans should add `api.coingecko.com` and `pro-api.coingecko.com` to their domain allowlist at [claude.ai/settings/capabilities](https://claude.ai/settings/capabilities).<br/>
+> Claude.ai users on paid plans should add `api.coingecko.com` and `pro-api.coingecko.com` to their domain allowlist at [claude.ai/settings/capabilities](https://claude.ai/settings/capabilities).<br/><br/>
 > Follow this guide here: http://docs.coingecko.com/docs/skills#allowlist-coingecko-domains-claude-paid-plans-only
 
 ### Agents / LLMs
