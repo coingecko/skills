@@ -13,6 +13,49 @@ description: >
 
 # CoinGecko Skill
 
+## When to use
+
+Trigger this skill when the user's request matches **any** of the following:
+
+### Crypto market data queries
+- Coin/token prices, market caps, trading volume, price changes
+- Historical price data, OHLC charts, time-range queries
+- Circulating or total supply data
+- Global crypto market stats (total market cap, BTC dominance, DeFi TVL)
+- Trending coins, top gainers/losers, newly listed coins
+
+### Token and contract lookups
+- Looking up a token by its contract address (e.g. `0x...`)
+- Token metadata, categories, or platform info
+- Comparing multiple coins or tokens
+
+### Exchange and trading data
+- Exchange listings, volume, tickers, trust scores
+- DEX-specific data (Uniswap, PancakeSwap, etc.)
+- Derivatives exchanges and tickers (futures, perpetuals)
+
+### On-chain / DeFi data (GeckoTerminal)
+- Liquidity pool data, trending/new pools, pool search
+- On-chain token prices, holder data, top traders
+- OHLCV candles or trade history for specific pools or tokens
+- DEX and network discovery (supported chains, DEXes)
+- On-chain pool categories and filtering
+
+### NFT data
+- NFT collection prices, floor prices, market data
+- NFT collection charts and tickers
+
+### Other triggers
+- Building dashboards, visualizations, or apps with crypto data
+- Questions about CoinGecko or GeckoTerminal API capabilities, endpoints, or rate limits
+- API key setup, authentication, plan tiers, or pricing questions
+- "What crypto data is available?" or similar exploratory questions
+- User mentions CoinGecko, GeckoTerminal, or shares a CoinGecko URL
+- Investment calculators, portfolio trackers, or ROI calculations involving crypto
+- Public company/institution crypto treasury holdings (e.g. "how much BTC does MicroStrategy hold?")
+
+---
+
 You have access to the CoinGecko API (aggregated data) and the GeckoTerminal API
 (on-chain DEX data). Together they cover virtually all crypto market data needs.
 Both APIs share the same API key and plan tier. GeckoTerminal endpoints use the
